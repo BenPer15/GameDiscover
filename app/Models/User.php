@@ -47,13 +47,43 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the profile for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    /**
+     * Get the notification preferences for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function notificationPreferences()
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
+
+    /**
+     * Get the notifications for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
      * Get the games for the user.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function games()
     {
-        return $this->hasMany(Game::class);
+        return $this->hasMany(UserGame::class);
     }
 
     /**

@@ -1,15 +1,21 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from "vue";
 
 const model = defineModel({
     type: String,
     required: true,
 });
 
+defineProps({
+    type: String,
+    icon: String,
+    placeholder: String,
+});
+
 const input = ref(null);
 
 onMounted(() => {
-    if (input.value.hasAttribute('autofocus')) {
+    if (input.value.hasAttribute("autofocus")) {
         input.value.focus();
     }
 });
@@ -18,9 +24,16 @@ defineExpose({ focus: () => input.value.focus() });
 </script>
 
 <template>
-    <input
-        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-        v-model="model"
-        ref="input"
-    />
+    <div
+        class="flex items-center w-full gap-2 text-white rounded-full shadow-sm bg-dark-light"
+    >
+        <i v-if="icon" :class="icon" class="ml-4 text-xs bx" />
+        <input
+            class="w-full text-xs font-normal bg-transparent border-none focus:border-transparent focus:ring-0 placeholder:text-white placeholder:text-xs"
+            v-model="model"
+            :type="type"
+            :placeholder="placeholder"
+            ref="input"
+        />
+    </div>
 </template>

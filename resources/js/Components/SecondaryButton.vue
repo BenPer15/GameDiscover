@@ -2,15 +2,28 @@
 defineProps({
     type: {
         type: String,
-        default: 'button',
+        default: "button",
     },
+    active: {
+        type: Boolean,
+        default: false,
+    },
+    size: {
+        type: String,
+        default: "md",
+    },
+    class: String,
 });
 </script>
 
 <template>
     <button
         :type="type"
-        class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
+        class="inline-flex items-center uppercase transition duration-150 ease-in-out rounded-lg shadow-sm bg-dark-light disabled:opacity-25 hover:bg-gray-300 hover:text-dark focus:outline-none focus:ring-gray-300 focus:ring-opacity-ring-opacity-50"
+        :class="class"
+        v-bind:class="{
+            'bg-gray-300 text-dark': active,
+        }"
     >
         <slot />
     </button>

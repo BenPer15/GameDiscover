@@ -1,3 +1,69 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-size: 11px;
+  color: #fff;
+  width: 100dvw;
+  height: 100dvh;
+  overflow-x: hidden;
+  @apply bg-gradient-to-r from-black to-dark;
+}
+
+.heroTitle {
+  font-weight: 700;
+  font-optical-sizing: auto;
+}
+
+.sortButton{
+  font-size: 8px;
+  padding: .2rem .5rem;
+}
+
+.gameCard{
+  box-shadow: inset 0px 0px 30px rgba(0,0,0,0.9);
+}
+
+.gameCard__border{
+ box-shadow: inset 0px 0px 1px rgba(255, 255, 255,0.9);
+}
+
+.gameCard__content{
+  background-color: rgba(19,26,53, .9);
+  box-shadow: inset  0px .2px 0px 0px rgba(255, 255, 255,0.9);
+}
+
+.gameCard__platform{
+  font-size: 8px;
+}
+
+.gameDetail__cover{
+  background-color: rgba(19,26,53, .9);
+  box-shadow: inset  0px .2px 0px 0px rgba(255, 255, 255,0.9);
+}
+
+.gameDetail__border{
+ box-shadow: inset 0px 0px 1px rgba(255, 255, 255,0.9);
+}
+
+.gameDetail_title{
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

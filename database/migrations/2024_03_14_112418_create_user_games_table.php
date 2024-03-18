@@ -13,9 +13,10 @@ return new class () extends Migration {
         Schema::create('user_games', function (Blueprint $table) {
             $table->uuid('id');
             $table->foreignId('user_id')->constrained()->delete('cascade');
-            $table->foreignUuid('game_id')->constrained()->delete('cascade');
+            $table->id('igdb_id');
             $table->integer('rating');
             $table->text('review');
+            $table->boolean('is_favorite');
             $table->boolean('is_wishlisted');
             $table->boolean('is_finished');
             $table->timestamps();

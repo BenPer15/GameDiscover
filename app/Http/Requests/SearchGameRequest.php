@@ -22,7 +22,7 @@ class SearchGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => 'required|string|min:3'
+            'gameName' => 'required|string|min:2'
         ];
     }
 }
