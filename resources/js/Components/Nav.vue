@@ -7,18 +7,12 @@ import SearchGame from "./SearchGame.vue";
 import SecondaryButton from "./SecondaryButton.vue";
 
 const page = usePage();
-
-const logout = () => {
-    axios.post(route("logout")).then(() => {
-        window.location = route("home.index");
-    });
-};
 const auth = computed(() => page.props.auth);
 </script>
 
 <template>
-    <nav class="text-white bg-dark">
-        <div class="flex items-center justify-between max-w-5xl p-4 mx-auto">
+    <nav class="relative z-30 text-white">
+        <div class="flex items-center justify-between p-4 mx-auto max-w-7xl">
             <div class="flex items-center gap-4 font-bold">
                 <ApplicationLogo />
                 <SearchGame />
@@ -54,9 +48,9 @@ const auth = computed(() => page.props.auth);
                     class="w-10 h-10 rounded-full"
                 />
 
-                <form @submit.prevent="logout">
+                <Link :href="route('settings.profile.edit')">
                     <button type="submit">{{ auth.user.name }}</button>
-                </form>
+                </Link>
             </div>
         </div>
     </nav>

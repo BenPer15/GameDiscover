@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SearchGameRequest extends FormRequest
+class GameReviewRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class SearchGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gameName' => 'required|string|min:2'
+            'id' => 'integer',
+            'rating' => 'integer|min:1|max:10',
+            'review' => 'string',
+            'is_favorite' => 'boolean',
+            'status' => 'string|in:wishlisted,completed,playing,played,dropped|nullable',
         ];
     }
 }

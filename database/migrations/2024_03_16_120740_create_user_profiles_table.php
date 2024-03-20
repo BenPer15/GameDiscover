@@ -16,6 +16,18 @@ return new class () extends Migration {
             $table->text('platforms')->default('[]');
             $table->text('genres')->default('[]');
             $table->text('mode')->default('[]');
+            $table->text('x_id')->nullable();
+            $table->text('insta_id')->nullable();
+            $table->text('steam_id')->nullable();
+            $table->text('epic_id')->nullable();
+            $table->text('origin_id')->nullable();
+            $table->text('discord_id')->nullable();
+            $table->text('twitch_id')->nullable();
+            $table->text('psn_id')->nullable();
+            $table->text('switch_id')->nullable();
+            $table->text('battleNet_id')->nullable();
+            $table->text('uPlay_id')->nullable();
+            $table->string('avatar')->nullable();
             $table->timestamps();
         });
     }

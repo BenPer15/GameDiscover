@@ -27,7 +27,7 @@ const props = defineProps({
 <template>
     <Head :title="query" />
     <BasicLayout>
-        <div class="max-w-5xl mx-auto my-12">
+        <div class="max-w-7xl mx-auto my-12">
             <div class="flex justify-between mb-2">
                 <span class="text-sm text-gray-500"
                     >{{ games.length }} results for "{{ query }}"

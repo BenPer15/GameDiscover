@@ -7,9 +7,12 @@ const model = defineModel({
 });
 
 defineProps({
+    class: String,
     type: String,
     icon: String,
     placeholder: String,
+    required: Boolean,
+    autofocus: Boolean,
 });
 
 const input = ref(null);
@@ -25,7 +28,7 @@ defineExpose({ focus: () => input.value.focus() });
 
 <template>
     <div
-        class="flex items-center w-full gap-2 text-white rounded-full shadow-sm bg-dark-light"
+        class="flex items-center w-full gap-2 text-white shadow-sm rounded-xl bg-dark-light"
     >
         <i v-if="icon" :class="icon" class="ml-4 text-xs bx" />
         <input
@@ -33,6 +36,8 @@ defineExpose({ focus: () => input.value.focus() });
             v-model="model"
             :type="type"
             :placeholder="placeholder"
+            :required="required"
+            :autofocus="autofocus"
             ref="input"
         />
     </div>

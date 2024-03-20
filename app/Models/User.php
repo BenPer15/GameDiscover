@@ -66,15 +66,6 @@ class User extends Authenticatable
         return $this->hasOne(UserNotificationPreference::class);
     }
 
-    /**
-     * Get the notifications for the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
 
     /**
      * Get the games for the user.

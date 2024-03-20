@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Benoit',
+            'email' => 'benoit.peron62@gmail.com',
         ]);
         $user->profile()->create([
             'platforms' => '["PS5", "PC"]',
@@ -28,8 +28,7 @@ class DatabaseSeeder extends Seeder
             'rating' => 4,
             'review' => "I really enjoyed this game. It's a great game to play with friends.",
             'is_favorite' => true,
-            'is_wishlisted' => false,
-            'is_finished' => false,
+            'status' => 'played',
         ]);
     }
 }

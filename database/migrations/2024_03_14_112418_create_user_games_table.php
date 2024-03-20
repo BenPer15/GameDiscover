@@ -14,11 +14,10 @@ return new class () extends Migration {
             $table->uuid('id');
             $table->foreignId('user_id')->constrained()->delete('cascade');
             $table->id('igdb_id');
-            $table->integer('rating');
-            $table->text('review');
-            $table->boolean('is_favorite');
-            $table->boolean('is_wishlisted');
-            $table->boolean('is_finished');
+            $table->integer('rating')->nullable();
+            $table->text('review')->nullable();
+            $table->boolean('is_favorite')->default(false);
+            $table->string('status')->nullable(); // wishlisted, completed, playing, played, dropped
             $table->timestamps();
         });
     }

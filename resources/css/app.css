@@ -6,7 +6,7 @@
 
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Exo", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
   font-size: 11px;
@@ -14,7 +14,7 @@ body {
   width: 100dvw;
   height: 100dvh;
   overflow-x: hidden;
-  @apply bg-gradient-to-r from-black to-dark;
+  @apply bg-dark;
 }
 
 .heroTitle {

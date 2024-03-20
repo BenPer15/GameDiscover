@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Game;
+use App\Http\Requests\GameReviewRequest;
+use App\Models\UserGame;
 use App\Services\GameService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Fluent;
 use Inertia\Inertia;
-use MarcReichel\IGDBLaravel\Models\Game as IGDBGame;
+use MarcReichel\IGDBLaravel\Models\Game;
 
 class GameController extends Controller
 {
@@ -19,7 +19,6 @@ class GameController extends Controller
     {
         $this->gameService = $gameService;
         $this->auth = $auth;
-
     }
 
     public function search(Request $request)
@@ -32,8 +31,6 @@ class GameController extends Controller
     public function searchAll(Request $request)
     {
         $query = $request->input('q');
-        // $limit = $request->input('limit');
-        // $offset = $request->input('offset');
         $sort = $request->input('sort');
         $asc = $request->input('asc');
 
@@ -43,26 +40,76 @@ class GameController extends Controller
 
     public function advancedSearch(Request $request)
     {
-        $searchTerm = $request->input('q');
+        // $searchTerm = $request->input('q');
         // $games = $this->gameService->searchGame($searchTerm);
         // return response()->json($games);
     }
 
     public function show($id)
     {
-        $games = $this->gameService->find((int)$id);
-        $game = new Fluent($games->first());
+        $game = $this->gameService->find((int)$id);
         $user = $this->auth->user();
         if ($user && $game) {
             $gameReviewedByUser = $user->games->where('igdb_id', $game->id)->first();
-            $game->total_rating = $gameReviewedByUser ? $gameReviewedByUser->rating : $game->total_rating;
-            $game->review = $gameReviewedByUser ? $gameReviewedByUser->review : '';
-            $game->is_favorite = $gameReviewedByUser ? $gameReviewedByUser->is_favorite : false;
-            $game->is_wishlisted = $gameReviewedByUser ? $gameReviewedByUser->is_wishlisted : false;
-            $game->is_finished = $gameReviewedByUser ? $gameReviewedByUser->is_finished : false;
+            $game->user = $gameReviewedByUser;
         }
         return Inertia::render('Games/Show', ['game' => $game]);
     }
 
+    public function storeStatus(GameReviewRequest $request)
+    {
+        $validated = $request->validated();
+        $user = $this->auth->user();
+        UserGame::create(
+            [
+                'user_id' => $user->id,
+                'igdb_id' => $validated['id'],
+                'status' => $validated['status'],
+            ]
+        );
 
+    }
+
+    public function updateStatus(GameReviewRequest $request, $id)
+    {
+        $userGame = UserGame::findOrFail($id);
+        $validated = $request->validated();
+        $userGame->update(
+            [
+                'status' => $validated['status'],
+            ]
+        );
+    }
+
+
+    public function storeReview(GameReviewRequest $request)
+    {
+        $gameReview = $request->validated();
+        $user = $this->auth->user();
+        $igdbGame = $this->gameService->find((int)$gameReview['id']);
+        UserGame::create(
+            [
+                'user_id' => $user->id,
+                'igdb_id' => $igdbGame->id,
+                'rating' => $gameReview['rating'] ?? null,
+                'review' => $gameReview['review'] ?? null,
+                'is_favorite' => $gameReview['is_favorite'] ?? false,
+                'status' => $gameReview['status'] ?? null,
+            ]
+        );
+        return redirect()->route('games.show', ['id' => $igdbGame->id]);
+    }
+
+    public function updateReview(GameReviewRequest $request, $id)
+    {
+        $gameReview = $request->validated();
+        $userGame = UserGame::find($id);
+
+        $userGame->rating = $gameReview['rating'] ?? $userGame->rating;
+        $userGame->review = $gameReview['review'] ?? $userGame->review;
+        $userGame->is_favorite = $gameReview['is_favorite'] ?? $userGame->is_favorite;
+        $userGame->status = $gameReview['status'];
+        $userGame->save();
+        return redirect()->route('games.show', ['id' => $userGame->igdb_id]);
+    }
 }

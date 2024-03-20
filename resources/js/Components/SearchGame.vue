@@ -59,7 +59,7 @@ const searchGames = () => {
         />
         <div
             v-if="searchQuery.length > 0"
-            class="absolute z-10 w-full p-4 space-y-4 text-black bg-white shadow-lg rounded-xl top-12"
+            class="absolute z-30 w-full p-4 space-y-4 text-black bg-white shadow-lg rounded-xl top-12"
         >
             <div v-if="searchQuery.length < 2">
                 Please enter 2 characters or more
@@ -73,7 +73,7 @@ const searchGames = () => {
                         class="flex items-center gap-4"
                     >
                         <img
-                            :src="game.cover"
+                            :src="game.coverImg"
                             :alt="game.name"
                             class="h-16 rounded-md"
                         />
