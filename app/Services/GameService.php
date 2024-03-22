@@ -95,9 +95,16 @@ class GameService
     private function getStream($gameId)
     {
 
+        $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+        $acceptLang = ['fr', 'it', 'en', 'es'];
+        $lang = in_array($lang, $acceptLang) ? $lang : 'en';
+
         $twitch = new Twitch();
-        $twitchGameId = $twitch->getGames(['igdb_id' => $gameId])->shift()->id;
-        $streams = $twitch->getStreams(['game_id' => $twitchGameId, 'first' => 1, 'language' => 'en']);
+        $twitchGame = $twitch->getGames(['igdb_id' => $gameId])->shift();
+        if (!$twitchGame) {
+            return null;
+        }
+        $streams = $twitch->getStreams(['game_id' => $twitchGame->id, 'first' => 1, 'language' => $lang]);
         return $streams->shift();
     }
 

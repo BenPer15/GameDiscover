@@ -17,10 +17,5 @@ export default defineConfig({
                 },
             },
         }),
-    ],
-    https: {
-        key: fs.readFileSync(path.resolve(__dirname, '/Users/benoit/certs/localhost-key.pem')),
-        cert: fs.readFileSync(path.resolve(__dirname, '/Users/benoit/certs/localhost.pem')),
-    },
-
+    ]
 });

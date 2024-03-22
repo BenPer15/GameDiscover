@@ -27,15 +27,19 @@ defineProps({
             class="w-full"
         >
         </iframe>
-        <div class="text-2xs">
+        <a
+            :href="'https://www.twitch.tv/' + stream.user_name"
+            class="text-2xs"
+            target="_blank"
+        >
             <span
                 v-if="stream.type === 'live'"
                 class="p-1 font-bold text-white bg-red-600 rounded py-0.5 mr-2 animate-pulse"
             >
                 Live
             </span>
+            <span class="font-bold">{{ stream.user_name }} : </span>
             <span>{{ stream.title }}</span>
-            <span class="font-bold"> {{ stream.user_name }}</span>
-        </div>
+        </a>
     </div>
 </template>

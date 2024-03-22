@@ -3,8 +3,8 @@ import { Head } from "@inertiajs/vue3";
 
 import BasicLayout from "@/Layouts/BasicLayout.vue";
 
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Gallery from "@/Components/Gallery/Index.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Reviews from "@/Components/Reviews/Index.vue";
 import ShowMore from "@/Components/ShowMore.vue";
 import TwitchLive from "@/Components/TwitchLive.vue";
@@ -90,6 +90,7 @@ const showGallery = () => {
                             class="flex flex-col w-1/3 px-4"
                         >
                             <TwitchLive
+                                v-if="game.stream"
                                 :stream="game.stream"
                                 height="150"
                                 width="520"
