@@ -23,7 +23,7 @@ class GameReviewRequest extends FormRequest
     {
         return [
             'id' => 'integer',
-            'rating' => 'integer|min:1|max:10',
+            'rating' => 'integer|min:1|max:5',
             'review' => 'string',
             'is_favorite' => 'boolean',
             'status' => 'string|in:wishlisted,completed,playing,played,dropped|nullable',

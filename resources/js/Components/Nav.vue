@@ -11,8 +11,10 @@ const auth = computed(() => page.props.auth);
 </script>
 
 <template>
-    <nav class="relative z-30 text-white">
-        <div class="flex items-center justify-between p-4 mx-auto max-w-7xl">
+    <nav class="relative z-20 text-white">
+        <div
+            class="flex items-center justify-between px-4 py-2 mx-auto mt-4 rounded-full max-w-7xl bg-dark"
+        >
             <div class="flex items-center gap-4 font-bold">
                 <ApplicationLogo />
                 <SearchGame />
@@ -39,17 +41,15 @@ const auth = computed(() => page.props.auth);
                     <i class="bx bx-bell" />
                 </SecondaryButton>
 
-                <img
-                    :src="
-                        'https://api.dicebear.com/8.x/bottts-neutral/svg?seed=' +
-                        auth.user.name
-                    "
-                    alt="avatar"
-                    class="w-10 h-10 rounded-full"
-                />
-
                 <Link :href="route('settings.profile.edit')">
-                    <button type="submit">{{ auth.user.name }}</button>
+                    <img
+                        :src="
+                            'https://api.dicebear.com/8.x/bottts-neutral/svg?seed=' +
+                            auth.user.name
+                        "
+                        alt="avatar"
+                        class="w-8 h-8 rounded-full"
+                    />
                 </Link>
             </div>
         </div>

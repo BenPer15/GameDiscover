@@ -17,29 +17,29 @@ const props = defineProps({
         <div class="absolute w-full h-full rounded-md gameCard__border" />
         <img :src="game.coverImg" :alt="game.title" class="absolute z-[-2]" />
         <div
-            class="absolute bottom-0 w-full h-20 z-[-1] gameCard__content flex justify-end flex-col p-2"
+            class="absolute bottom-0 w-full h-20 z-[-1] gameCard__content flex justify-between flex-col p-2"
         >
-            <h3
-                class="text-xs bg-primary shadow absolute top-[-0.75rem] rounded-full px-2 py-1"
-            >
+            <h3 class="text-xs">
                 {{ game.name.slice(0, 40) }}
             </h3>
-            <div class="flex items-center justify-end w-full gap-1 text-xs">
-                {{ game.total_rating }}
-                <i class="bx bxs-star" />
-            </div>
-            <div class="flex justify-between w-full text-xs">
-                <span class="text-gray-400">
-                    {{ game.release_date }}
-                </span>
-                <div class="flex gap-2">
-                    <div
-                        v-if="game.platforms"
-                        v-for="platform in game.platforms.slice(0, 4)"
-                        :key="platform.id"
-                        class="rounded-full gameCard__platform"
-                    >
-                        {{ platform.abbreviation }}
+            <div>
+                <div class="flex items-center justify-end w-full gap-1 text-xs">
+                    {{ game.total_rating }}
+                    <i class="bx bxs-star" />
+                </div>
+                <div class="flex justify-between w-full text-xs">
+                    <span class="text-gray-400">
+                        {{ game.release_date }}
+                    </span>
+                    <div class="flex gap-2">
+                        <div
+                            v-if="game.platforms"
+                            v-for="platform in game.platforms.slice(0, 4)"
+                            :key="platform.id"
+                            class="rounded-full gameCard__platform"
+                        >
+                            {{ platform.abbreviation }}
+                        </div>
                     </div>
                 </div>
             </div>

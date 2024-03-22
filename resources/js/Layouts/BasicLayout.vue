@@ -3,9 +3,13 @@ import Nav from "@/Components/Nav.vue";
 </script>
 
 <template>
-    <div class="h-dvh w-dvw">
+    <header>
         <Nav />
-        <slot />
-        <footer></footer>
-    </div>
+    </header>
+    <main role="main" class="h-auto">
+        <div class="h-auto mx-auto max-w-7xl">
+            <slot />
+        </div>
+    </main>
+    <footer></footer>
 </template>

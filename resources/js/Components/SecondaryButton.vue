@@ -8,10 +8,6 @@ defineProps({
         type: Boolean,
         default: false,
     },
-    size: {
-        type: String,
-        default: "md",
-    },
     class: String,
 });
 </script>

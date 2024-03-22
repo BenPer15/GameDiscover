@@ -20,7 +20,7 @@ const props = defineProps({
 
 <template>
     <Link :href="href">
-        <SecondaryButton size="xs" :active="active" class="px-3 py-1">
+        <SecondaryButton :active="active" class="px-3 py-1 text-xs">
             <slot />
             <div v-if="active">
                 <span v-if="asc" class="ml-1"

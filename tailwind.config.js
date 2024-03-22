@@ -15,12 +15,12 @@ export default {
         extend: {
             colors: {
                 dark: {
-                    DEFAULT: "#1E1E1E",
+                    DEFAULT: "#141414",
                     light: "#252525",
                     lighter: "#2B2B2B",
                 },
                 primary: {
-                    DEFAULT: "#367CFE",
+                    DEFAULT: "#58c3f8",
                     hover: "rgb(96 165 250)"
                 },
             },

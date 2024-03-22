@@ -27,7 +27,7 @@ const props = defineProps({
 <template>
     <Head :title="query" />
     <BasicLayout>
-        <div class="max-w-7xl mx-auto my-12">
+        <div class="mx-auto my-12 max-w-7xl">
             <div class="flex justify-between mb-2">
                 <span class="text-sm text-gray-500"
                     >{{ games.length }} results for "{{ query }}"
@@ -74,7 +74,7 @@ const props = defineProps({
                     </SortButton>
                 </div>
             </div>
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-6 gap-4">
                 <GameCard v-for="game in games" :key="game.id" :game="game" />
             </div>
         </div>

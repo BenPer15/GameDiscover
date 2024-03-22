@@ -46,7 +46,8 @@ const {
                 <SecondaryButton
                     @click="prevSlide"
                     v-bind:class="{
-                        'opacity-50': currentIndex === 0,
+                        'opacity-50 hover:bg-dark hover:text-inherit cursor-default':
+                            currentIndex === 0,
                     }"
                 >
                     <i class="bx bx-chevron-left"></i>
@@ -54,7 +55,8 @@ const {
                 <SecondaryButton
                     @click="nextSlide"
                     v-bind:class="{
-                        'opacity-50': currentIndex === totalPages - 1,
+                        'opacity-50 hover:bg-dark hover:text-inherit cursor-default':
+                            currentIndex === totalPages - 1,
                     }"
                 >
                     <i class="bx bx-chevron-right"></i>

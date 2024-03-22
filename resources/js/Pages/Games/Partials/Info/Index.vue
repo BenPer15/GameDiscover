@@ -6,14 +6,14 @@ const props = defineProps({
 });
 
 const sortedGenres = computed(() => {
-    return props.game.genres.sort((a, b) => a.name.localeCompare(b.name));
+    return props.game.genres?.sort((a, b) => a.name.localeCompare(b.name));
 });
 </script>
 
 <template>
     <div class="flex flex-col gap-2 text-2xs">
-        <div class="flex items-center gap-4">
-            <span class="w-20 font-bold uppercase">Platforms</span>
+        <div class="flex items-center gap-4" v-if="game.platforms">
+            <span class="w-20 font-bold uppercase">Available on</span>
             <div class="flex gap-2">
                 <template v-for="platform in game.platforms">
                     <span>
@@ -22,7 +22,7 @@ const sortedGenres = computed(() => {
                 </template>
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4" v-if="sortedGenres">
             <span class="w-20 font-bold uppercase">Genres</span>
             <div class="flex gap-2">
                 <template v-for="genre in sortedGenres" :key="genre.id">
@@ -34,7 +34,7 @@ const sortedGenres = computed(() => {
                 </template>
             </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4" v-if="game.game_modes">
             <span class="w-20 font-bold uppercase">Game Modes</span>
             <div class="flex gap-2">
                 <template v-for="mode in game.game_modes"

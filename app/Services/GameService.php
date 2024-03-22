@@ -20,6 +20,7 @@ class GameService
     {
         try {
             $igdbGames = IGDBGame::fuzzySearch(['name'], $gameName)
+                ->where('platforms', '!=', null)
                 ->select(['id', 'name', 'platforms', 'cover', 'first_release_date'])
                 ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
                 ->orderBy('total_rating', 'desc')
@@ -41,6 +42,7 @@ class GameService
     {
         try {
             $igdbGames = IGDBGame::fuzzySearch(['name'], $gameName)
+                ->where('platforms', '!=', null)
                 ->select([ 'id', 'name', 'platforms', 'cover', 'first_release_date'])
                 ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
                 ->orderBy($orderBy ?? 'total_rating', $asc ? 'asc' : 'desc')
@@ -77,10 +79,38 @@ class GameService
         $game->total_played = $usersGame['totalPlayed'];
         $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
         $game->medias = $images;
-        $game->background = $images ? $images->first()['url'] : 'https://via.placeholder.com/1920x1080?text=No+Background';
+        $game->background = $this->getBackgroundOfGame($images);
         $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
         $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
         return $game;
+    }
+
+    private function getRandomImageUrl($images, $condition): ?string
+    {
+        $filteredImages = $images->filter($condition)->values();
+        if ($filteredImages->isNotEmpty()) {
+            return $filteredImages[random_int(0, $filteredImages->count() - 1)]['url'];
+        }
+        return null;
+    }
+
+    private function getBackgroundOfGame($images): string | null
+    {
+
+        $backgroundFullHD = $this->getRandomImageUrl($images, function ($image) {
+            return $image['fullHd'];
+        });
+
+        $backgroundHD = $this->getRandomImageUrl($images, function ($image) {
+            return $image['hd'];
+        });
+
+        $backgroundLow = $this->getRandomImageUrl($images, function ($image) {
+            return !$image['hd'] && !$image['fullHd'];
+        });
+
+
+        return $backgroundFullHD ?? $backgroundHD ?? $backgroundLow ?? null;
     }
 
 
@@ -88,23 +118,26 @@ class GameService
     {
         $images = collect();
         $screenshots = $game->screenshots;
-        if ($screenshots->isNotEmpty()) {
+        if ($screenshots && $screenshots->isNotEmpty()) {
             $images = $images->concat($screenshots->map(function ($screenshot) {
                 return [
                     'url' => $screenshot->getUrl(Size::ORIGINAL),
-                    'type' => 'screenshot'
+                    'type' => 'screenshot',
+                    'hd' => $screenshot->height > 720 && $screenshot->height < 1080,
+                    'fullHd' => $screenshot->height >= 1080
                 ];
             }));
         }
-
         $artworks = $game->artworks;
 
-        if (count($artworks) > 0) {
+        if ($artworks && count($artworks) > 0) {
             $images = $images->concat(array_map(function ($artwork) {
 
                 return [
                    'url' =>  Artwork::find($artwork['id'])->getUrl(Size::ORIGINAL),
-                   'type' => 'artwork'
+                   'type' => 'artwork',
+                   'hd' => $artwork['height'] > 720,
+                'fullHd' => $artwork['height'] > 1080
                 ];
             }, $artworks));
         }

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --dark-color: #141414;
+    --primary-color: #58c3f8;
+}
+
 html,
 body {
     font-family: "Exo", sans-serif;
@@ -12,7 +17,11 @@ body {
     width: 100dvw;
     height: 100dvh;
     overflow-x: hidden;
-    @apply bg-dark;
+}
+
+body {
+    position: relative;
+    background-color: var(--dark-color);
 }
 
 .heroTitle {
@@ -27,6 +36,10 @@ body {
 
 .gameCard {
     box-shadow: inset 0px 0px 30px rgba(0, 0, 0, 0.9);
+}
+
+.gameCard_background {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--dark-color));
 }
 
 .gameCard__border {
