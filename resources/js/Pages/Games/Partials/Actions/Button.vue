@@ -15,10 +15,10 @@ const props = defineProps({
         v-bind:class="{
             ' text-primary ': active,
         }"
-        class="flex flex-col items-center justify-center p-2 px-3 hover:bg-dark-lighter"
+        class="flex flex-col items-center justify-center p-2 px-3 text-xs hover:bg-dark-lighter"
         :class="class"
     >
-        <i class="text-base bx" :class="(active ? 'bxs-' : 'bx-') + icon"></i>
+        <i class="text-lg bx" :class="(active ? 'bxs-' : 'bx-') + icon"></i>
         <slot />
     </button>
 </template>

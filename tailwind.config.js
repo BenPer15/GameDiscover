@@ -24,6 +24,10 @@ export default {
                     hover: "rgb(96 165 250)"
                 },
             },
+            fontSize: {
+                "2xs": ["0.625rem", "1rem"],
+                "3xs": [".5rem", "1rem"],
+            },
             textShadow: {
                 sm: "0 1px 2px var(--tw-shadow-color)",
                 DEFAULT: "0 2px 4px var(--tw-shadow-color)",

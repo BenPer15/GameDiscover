@@ -1,8 +1,13 @@
 <script setup>
-import GameActions from "@/Components/Game/Actions/Index.vue";
+import { Head } from "@inertiajs/vue3";
+
 import BasicLayout from "@/Layouts/BasicLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
+
+import Gallery from "@/Components/Gallery/Index.vue";
+import ShowMore from "@/Components/ShowMore.vue";
+
+import GameActions from "./Partials/Actions/Index.vue";
+import GameInfo from "./Partials/Info/Index.vue";
 
 const props = defineProps({
     game: Array,
@@ -12,33 +17,27 @@ const getDeveloper = () => {
     return props.game.involved_companies.find((company) => company.developer)
         ?.company.name;
 };
-
-const sortedGenres = computed(() => {
-    return props.game.genres.sort((a, b) => a.name.localeCompare(b.name));
-});
 </script>
 
 <template>
     <Head :title="game.name" />
     <BasicLayout>
-        <div>
+        <div class="relative">
             <div
                 class="absolute top-0 left-0 w-full bg-center bg-no-repeat bg-cover h-[30rem]"
                 :style="{ backgroundImage: 'url(' + game.background + ')' }"
             >
                 <div
-                    class="absolute top-0 left-0 w-full h-full backdrop-blur-sm"
+                    class="absolute top-0 left-0 w-full h-full backdrop-blur-xl"
                 />
                 <div
                     class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent from-90% to-dark"
                 ></div>
             </div>
 
-            <div class="relative flex mx-auto max-w-7xl">
+            <div class="relative flex px-3 mx-auto max-w-7xl">
                 <div class="flex w-full gap-6 mt-48">
-                    <div
-                        class="flex flex-col items-center justify-center w-1/6 gap-4"
-                    >
+                    <div class="flex flex-col items-center w-1/6 gap-4">
                         <div
                             class="relative overflow-hidden rounded-md shadow w-44 h-60"
                         >
@@ -48,26 +47,17 @@ const sortedGenres = computed(() => {
                             <img
                                 :src="game.coverImg"
                                 :alt="game.title"
-                                class="absolute object-cover w-full h-full"
+                                class="object-cover w-full h-full"
                             />
                         </div>
 
                         <GameActions :game="game" />
                     </div>
 
-                    <div class="flex flex-col w-full gap-4 mt-24">
+                    <div class="flex flex-col w-full gap-4 mt-12">
                         <h1 class="text-4xl font-bold gameDetail_title">
                             {{ game.name }}
                         </h1>
-                        <div>
-                            <Link
-                                v-for="genre in sortedGenres"
-                                class="px-2 py-1 mr-2 text-xs font-bold lowercase bg-white rounded-xl text-dark"
-                            >
-                                <span class="text-primary">#</span>
-                                {{ genre.name }}
-                            </Link>
-                        </div>
                         <p class="text-base">
                             Released on
                             <span class="font-bold">{{
@@ -76,6 +66,21 @@ const sortedGenres = computed(() => {
                             by
                             <span class="font-bold">{{ getDeveloper() }}</span>
                         </p>
+
+                        <div class="flex justify-between w-full gap-5 mt-5">
+                            <div class="flex flex-col w-2/3 gap-4">
+                                <GameInfo :game="game" />
+
+                                <ShowMore :text="game.summary" />
+                            </div>
+
+                            <div class="flex flex-col w-1/3 px-4">
+                                <Gallery
+                                    :medias="game.medias"
+                                    maxLength="500"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -59,9 +59,9 @@ class GameService
 
     public function find($id): IGDBGame
     {
-        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres'])
+        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes'])
             ->where('id', '=', $id)
-            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks'])
+            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes'])
             ->first();
 
         if (!$game) {
@@ -76,12 +76,12 @@ class GameService
         $game->total_wishlisted = $usersGame['totalWishlisted'];
         $game->total_played = $usersGame['totalPlayed'];
         $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
-        $game->background = $images ? $images->first() : 'https://via.placeholder.com/1920x1080?text=No+Background';
+        $game->medias = $images;
+        $game->background = $images ? $images->first()['url'] : 'https://via.placeholder.com/1920x1080?text=No+Background';
         $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
         $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
         return $game;
     }
-
 
 
     private function getImagesOfGame($game): Collection
@@ -90,14 +90,23 @@ class GameService
         $screenshots = $game->screenshots;
         if ($screenshots->isNotEmpty()) {
             $images = $images->concat($screenshots->map(function ($screenshot) {
-                return $screenshot->getUrl(Size::ORIGINAL);
+                return [
+                    'url' => $screenshot->getUrl(Size::ORIGINAL),
+                    'type' => 'screenshot'
+                ];
             }));
         }
-        $artworks = new Fluent($game->artworks);
-        if ($artworks->isNotEmpty()) {
-            $images = $images->concat($artworks->map(function ($artwork) {
-                return  Artwork::find($artwork->id)->getUrl(Size::ORIGINAL);
-            }));
+
+        $artworks = $game->artworks;
+
+        if (count($artworks) > 0) {
+            $images = $images->concat(array_map(function ($artwork) {
+
+                return [
+                   'url' =>  Artwork::find($artwork['id'])->getUrl(Size::ORIGINAL),
+                   'type' => 'artwork'
+                ];
+            }, $artworks));
         }
         return $images;
     }
