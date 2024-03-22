@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "marcreichel/igdb-laravel": "^4.2",
+        "romanzipp/laravel-twitch": "^4.7",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

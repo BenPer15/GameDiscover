@@ -48,7 +48,7 @@ const auth = computed(() => page.props.auth);
                             auth.user.name
                         "
                         alt="avatar"
-                        class="w-8 h-8 rounded-full"
+                        class="rounded-full w-7 h-7"
                     />
                 </Link>
             </div>

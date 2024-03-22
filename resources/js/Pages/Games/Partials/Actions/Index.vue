@@ -2,6 +2,7 @@
 import { router, usePage } from "@inertiajs/vue3";
 import { defineProps, onUpdated, ref } from "vue";
 import Button from "./Button.vue";
+
 const props = defineProps({
     game: Object,
 });

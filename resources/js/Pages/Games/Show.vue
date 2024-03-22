@@ -3,8 +3,11 @@ import { Head } from "@inertiajs/vue3";
 
 import BasicLayout from "@/Layouts/BasicLayout.vue";
 
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Gallery from "@/Components/Gallery/Index.vue";
+import Reviews from "@/Components/Reviews/Index.vue";
 import ShowMore from "@/Components/ShowMore.vue";
+import TwitchLive from "@/Components/TwitchLive.vue";
 
 import GameActions from "./Partials/Actions/Index.vue";
 import GameInfo from "./Partials/Info/Index.vue";
@@ -24,7 +27,7 @@ const showGallery = () => {
 </script>
 
 <template>
-    <Head :title="game.name" />
+    <Head :title="game.name + ' (' + game.year_release_date + ')'" />
     <BasicLayout>
         <div
             v-if="game.background"
@@ -51,7 +54,9 @@ const showGallery = () => {
                             class="object-cover w-full h-full"
                         />
                     </div>
-
+                    <PrimaryButton class="w-full capitalize"
+                        >Discover this game</PrimaryButton
+                    >
                     <GameActions :game="game" />
                 </div>
 
@@ -73,12 +78,22 @@ const showGallery = () => {
                                 v-if="game.summary"
                                 :text="game.summary"
                             />
+
+                            <Reviews
+                                :review="game?.reviews"
+                                :gameId="game?.id"
+                            />
                         </div>
 
                         <div
                             v-if="showGallery()"
                             class="flex flex-col w-1/3 px-4"
                         >
+                            <TwitchLive
+                                :stream="game.stream"
+                                height="150"
+                                width="520"
+                            />
                             <Gallery :medias="game.medias" maxLength="500" />
                         </div>
                     </div>

@@ -7,12 +7,12 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection ;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Fluent;
 use MarcReichel\IGDBLaravel\Enums\Image\Size;
 use MarcReichel\IGDBLaravel\Models\Artwork;
 use MarcReichel\IGDBLaravel\Models\Game as IGDBGame;
-use MarcReichel\IGDBLaravel\Models\GameVideo;
 use MarcReichel\IGDBLaravel\Models\InvolvedCompany;
+
+use romanzipp\Twitch\Twitch;
 
 class GameService
 {
@@ -61,6 +61,8 @@ class GameService
 
     public function find($id): IGDBGame
     {
+
+
         $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes'])
             ->where('id', '=', $id)
             ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes'])
@@ -69,20 +71,34 @@ class GameService
         if (!$game) {
             return collect([]);
         }
+
+
+
         $usersGame = $this->getUsersGame($game);
         $images = $this->getImagesOfGame($game);
         $game->total_rating = $usersGame['totalRating'];
         $game->count_rating = $usersGame['countRating'];
-        $game->reviews = $usersGame['reviews'];
+        $game->reviews = $usersGame['reviews'] ?? [];
         $game->total_playing = $usersGame['totalPlaying'];
         $game->total_wishlisted = $usersGame['totalWishlisted'];
         $game->total_played = $usersGame['totalPlayed'];
         $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
         $game->medias = $images;
         $game->background = $this->getBackgroundOfGame($images);
+        $game->stream = $this->getStream($game['id']);
         $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
+        $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
         $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
         return $game;
+    }
+
+    private function getStream($gameId)
+    {
+
+        $twitch = new Twitch();
+        $twitchGameId = $twitch->getGames(['igdb_id' => $gameId])->shift()->id;
+        $streams = $twitch->getStreams(['game_id' => $twitchGameId, 'first' => 1, 'language' => 'en']);
+        return $streams->shift();
     }
 
     private function getRandomImageUrl($images, $condition): ?string
