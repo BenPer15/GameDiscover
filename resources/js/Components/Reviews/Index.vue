@@ -1,17 +1,30 @@
 <script setup>
+import { Link, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 import Add from "./Add.vue";
+import Review from "./Review.vue";
 
-defineProps({
+const page = usePage();
+const auth = computed(() => page.props.auth);
+
+const props = defineProps({
     reviews: Array,
     gameId: Number,
 });
+
+const currentUserHasReview = computed(
+    () =>
+        !!props.reviews.find((review) => review.user.id === auth.value.user.id)
+);
 </script>
 
 <template>
-    <div class="flex flex-col w-full gap-4">
-        <h2 class="text-2xl font-bold">Reviews</h2>
+    <div class="flex flex-col w-full gap-4" v-if="auth.user">
+        <h2 class="text-2xl font-bold">
+            Reviews <span class="text-sm">({{ reviews.length }})</span>
+        </h2>
         <Review
-            v-if="reviews"
+            v-if="reviews.length"
             v-for="review in reviews"
             :key="review.id"
             :review="review"
@@ -23,6 +36,12 @@ defineProps({
             >
         </p>
 
-        <Add :gameId="gameId" />
+        <Add v-if="!currentUserHasReview" :gameId="gameId" />
+    </div>
+    <div v-else>
+        <p class="text-sm">
+            <Link :href="route('login')" class="text-primary"> Sign in </Link>
+            to share your review with the community.
+        </p>
     </div>
 </template>

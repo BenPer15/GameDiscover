@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Review;
 use App\Models\UserGame;
+use App\Models\UserGameInteraction;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection ;
@@ -61,8 +63,6 @@ class GameService
 
     public function find($id): IGDBGame
     {
-
-
         $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes'])
             ->where('id', '=', $id)
             ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes'])
@@ -72,16 +72,11 @@ class GameService
             return collect([]);
         }
 
-
-
-        $usersGame = $this->getUsersGame($game);
+        $reviews = $this->getReviews($game->id);
         $images = $this->getImagesOfGame($game);
-        $game->total_rating = $usersGame['totalRating'];
-        $game->count_rating = $usersGame['countRating'];
-        $game->reviews = $usersGame['reviews'] ?? [];
-        $game->total_playing = $usersGame['totalPlaying'];
-        $game->total_wishlisted = $usersGame['totalWishlisted'];
-        $game->total_played = $usersGame['totalPlayed'];
+        $game->reviews = $reviews['reviews'] ?? [];
+        $game->sentimentsScore = $reviews['sentimentScore'];
+        $game->gameUserInteractions = $this->getGameUserInteractions($game->id);
         $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
         $game->medias = $images;
         $game->background = $this->getBackgroundOfGame($images);
@@ -174,31 +169,60 @@ class GameService
         });
     }
 
-    private function getUsersGame($game)
+    private function getReviews($igdb_id)
     {
-        $totalRating = 0;
-        $totalPlaying = 0;
-        $countRating = 0;
-        $totalWishlisted = 0;
-        $totalPlayed = 0;
-
-        $userGames = UserGame::where('igdb_id', $game->id)->get();
-        $ratings = $userGames->pluck('rating');
-
-        $reviews = $userGames->map(function ($userGame) {
+        $reviewsData = Review::where('igdb_id', $igdb_id)->with(['likes', 'comments'])->get();
+        if($reviewsData->isEmpty()) {
             return [
-                'id' => $userGame->id,
-                'review' => $userGame->review,
-                'user' => $userGame->user,
-                'created_at' =>  Carbon::parse($userGame->created_at)->format('d M Y')
+                'reviews' => [],
+                'sentimentScore' => [
+                    'count' => 0,
+                    'total' => 0
+                ],
+            ];
+        }
+
+        // Filter reviews with content
+        $reviews = $reviewsData->filter(function ($data) {
+            return $data->content !== null;
+        })->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'content' => $review->content,
+                'sentiment_score' => $review->sentiment_score,
+                'user' => $review->user,
+                'likes' => $review->likes,
+                'comments' => $review->comments,
+                'created_at' =>  Carbon::parse($review->created_at)->format('d M Y')
             ];
         });
-        if ($ratings->isNotEmpty()) {
-            $countRating = $ratings->count();
-            $totalRating = $ratings->sum() / $ratings->count();
-        }
-        $status = $userGames->pluck('status');
 
+        // Calculate sentiment score
+        $sentimentScores = $reviewsData->pluck('sentiment_score');
+        if ($sentimentScores->isNotEmpty()) {
+            $countSentimentScore = $sentimentScores->count();
+            $totalSentimentScore = $sentimentScores->sum() / $sentimentScores->count();
+        }
+
+        return [
+            'reviews' => $reviews,
+            'sentimentScore' => [
+                'count' => $countSentimentScore ?? 0,
+                'total' => $totalSentimentScore ?? 0
+            ],
+        ];
+    }
+
+    private function getGameUserInteractions($igdb_id)
+    {
+        $totalPlaying = 0;
+        $totalWishlisted = 0;
+        $totalPlayed = 0;
+        $totalFavorite = 0;
+
+        $userGameInteractionsData = UserGameInteraction::where('igdb_id', $igdb_id)->get();
+
+        $status = $userGameInteractionsData->pluck('status');
         if ($status->isNotEmpty()) {
             $totalPlaying = $status->filter(function ($value) {
                 return $value === 'playing';
@@ -211,13 +235,24 @@ class GameService
             })->count();
         }
 
+        $isFavorite = $userGameInteractionsData->pluck('is_favorite');
+        if ($isFavorite->isNotEmpty()) {
+            $totalFavorite = $isFavorite->filter(function ($value) {
+                return $value === true;
+            })->count();
+        }
+
+        $gameInteractionByUser = $userGameInteractionsData->filter(function ($data) {
+            return $data->user_id === auth()->id();
+        })->first();
+
+
         return [
-            'reviews' => $reviews,
-            'countRating' => $countRating,
-            'totalRating' => $totalRating,
-            'totalWishlisted' => $totalWishlisted,
             'totalPlaying' => $totalPlaying,
-            'totalPlayed' => $totalPlayed
+            'totalWishlisted' => $totalWishlisted,
+            'totalPlayed' => $totalPlayed,
+            'totalFavorite' => $totalFavorite,
+            'currentUser' => $gameInteractionByUser
         ];
     }
 }

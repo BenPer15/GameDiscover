@@ -4,27 +4,34 @@ import { defineProps, onUpdated, ref } from "vue";
 import Button from "./Button.vue";
 
 const props = defineProps({
-    game: Object,
+    gameUserInteractions: Object,
+    igdbId: Number,
 });
 
-const game = ref(props.game);
+const gUI = ref(props.gameUserInteractions);
 
 const setStatus = (status) => {
     const data = {
-        status: status === game.value.user?.status ? null : status,
-        id: game.value.id,
+        status: status === gUI.value.currentUser?.status ? null : status,
+        igdb_id: props.igdbId,
     };
-    if (game.value.user) {
-        router.put(route("games.updateStatus", game.value.user.id), data, {
-            only: ["game"],
-        });
+    if (gUI.value.currentUser) {
+        router.put(
+            route("games.updateStatus", gUI.value.currentUser.id),
+            data,
+            {
+                only: ["gameUserInteraction"],
+            }
+        );
     } else {
-        router.post(route("games.storeStatus"), data, { only: ["game"] });
+        router.post(route("games.storeStatus"), data, {
+            only: ["gameUserInteraction"],
+        });
     }
 };
 
 onUpdated(() => {
-    game.value = usePage().props.game;
+    gUI.value = usePage().props.gameUserInteraction;
 });
 </script>
 
@@ -34,10 +41,10 @@ onUpdated(() => {
             class="rounded-l-lg"
             icon="gift"
             :click="() => setStatus('wishlisted')"
-            :active="game.user?.status === 'wishlisted'"
+            :active="gUI.currentUser?.status === 'wishlisted'"
         >
             <span>Wishlist</span>
-            {{ game.total_wishlisted }}
+            {{ gUI.totalWishlisted }}
         </Button>
 
         <div class="py-2 my-auto border-r border-gray-600 h-2/3" />
@@ -45,11 +52,11 @@ onUpdated(() => {
         <Button
             :click="() => setStatus('playing')"
             icon="joystick"
-            :game="game"
-            :active="game.user?.status === 'playing'"
+            :game="gUI"
+            :active="gUI.currentUser?.status === 'playing'"
         >
             <span>Playing</span>
-            {{ game.total_playing }}
+            {{ gUI.totalPlaying }}
         </Button>
 
         <div class="py-2 my-auto border-r border-gray-600 h-2/3" />
@@ -60,15 +67,19 @@ onUpdated(() => {
             :game="game"
             icon="check-circle"
             :active="
-                ['played', 'completed', 'aborded'].includes(game.user?.status)
+                ['played', 'completed', 'aborded'].includes(
+                    gUI.currentUser?.status
+                )
             "
         >
             <span class="first-letter:uppercase">{{
-                ["played", "completed", "aborded"].includes(game.user?.status)
-                    ? game.user?.status
+                ["played", "completed", "aborded"].includes(
+                    gUI.currentUser?.status
+                )
+                    ? gUI.currentUser?.status
                     : "Played"
             }}</span>
-            {{ game.total_played }}
+            {{ gUI.totalPlayed }}
         </Button>
     </div>
 </template>

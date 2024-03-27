@@ -10,7 +10,11 @@ export default {
         "./resources/views/**/*.blade.php",
         "./resources/js/**/*.vue",
     ],
-
+    safelist: [
+        {
+            pattern: /(text|bg|border)-(red|lime|green|yellow|orange)-(400|500|700|800)/,
+        },
+    ],
     theme: {
         extend: {
             colors: {

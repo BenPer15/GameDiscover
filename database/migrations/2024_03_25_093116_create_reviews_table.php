@@ -10,10 +10,12 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('friends', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->foreignId('user_id')->constrained()->delete('cascade');
-            $table->foreignUuid('friend_id')->constrained('users')->delete('cascade');
+        Schema::create('reviews', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->integer('igdb_id')->index();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->integer('sentiment_score')->nullable()->index();
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('friends');
+        Schema::dropIfExists('reviews');
     }
 };

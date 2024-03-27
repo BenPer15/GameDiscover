@@ -10,14 +10,12 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('user_games', function (Blueprint $table) {
-            $table->uuid('id');
+        Schema::create('user_game_interactions', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained()->delete('cascade');
-            $table->id('igdb_id');
-            $table->integer('rating')->nullable();
-            $table->text('review')->nullable();
-            $table->boolean('is_favorite')->default(false);
-            $table->string('status')->nullable(); // wishlisted, completed, playing, played, dropped
+            $table->integer('igdb_id')->index();
+            $table->boolean('is_favorite')->default(false)->index();
+            $table->string('status')->nullable()->index();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_games');
+        Schema::dropIfExists('user_game_interactions');
     }
 };

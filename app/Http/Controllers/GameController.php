@@ -2,23 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\GameReviewRequest;
-use App\Models\UserGame;
+use App\Http\Requests\LikeReviewRequest;
+use App\Http\Requests\ReviewRequest;
+
+use App\Http\Requests\UserGameInteractionRequest;
+use App\Models\Review;
+use App\Models\ReviewLike;
+use App\Models\UserGameInteraction;
 use App\Services\GameService;
+use App\Services\GoogleCloudService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use MarcReichel\IGDBLaravel\Models\Game;
 
 class GameController extends Controller
 {
-    private $gameService;
+    protected $gameService;
     protected $auth;
+    protected $googleCloudService;
 
-    public function __construct(GameService $gameService, Guard $auth)
+
+    public function __construct(GameService $gameService, Guard $auth, GoogleCloudService $googleCloudService)
     {
         $this->gameService = $gameService;
         $this->auth = $auth;
+        $this->googleCloudService = $googleCloudService;
     }
 
     public function search(Request $request)
@@ -48,68 +56,85 @@ class GameController extends Controller
     public function show($id)
     {
         $game = $this->gameService->find((int)$id);
-        $user = $this->auth->user();
-        if ($user && $game) {
-            $gameReviewedByUser = $user->games->where('igdb_id', $game->id)->first();
-            $game->user = $gameReviewedByUser;
-        }
         return Inertia::render('Games/Show', ['game' => $game]);
     }
 
-    public function storeStatus(GameReviewRequest $request)
+    public function storeUserGameInteraction(UserGameInteractionRequest $request)
     {
         $validated = $request->validated();
         $user = $this->auth->user();
-        UserGame::create(
+        UserGameInteraction::create(
             [
                 'user_id' => $user->id,
-                'igdb_id' => $validated['id'],
-                'status' => $validated['status'],
+                'igdb_id' => $validated['igdb_id'],
+                'status' => $validated['status'] ?? null,
+                'is_favorite' => $validated['is_favorite'] ?? false,
             ]
         );
-
     }
 
-    public function updateStatus(GameReviewRequest $request, $id)
+    public function updateUserGameInteraction(UserGameInteractionRequest $request, $id)
     {
-        $userGame = UserGame::findOrFail($id);
+        $userGameInteraction = UserGameInteraction::findOrFail($id);
         $validated = $request->validated();
-        $userGame->update(
+        $userGameInteraction->update(
             [
                 'status' => $validated['status'],
+                'is_favorite' => $validated['is_favorite'],
             ]
         );
     }
 
 
-    public function storeReview(GameReviewRequest $request)
+    public function storeReview(ReviewRequest $request)
     {
-        $gameReview = $request->validated();
+        $validated = $request->validated();
+        $review = $validated['content'];
+        $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($review);
         $user = $this->auth->user();
-        $igdbGame = $this->gameService->find((int)$gameReview['id']);
-        UserGame::create(
+        $igdbGame = $this->gameService->find((int)$validated['igdb_id']);
+
+        Review::create(
             [
                 'user_id' => $user->id,
                 'igdb_id' => $igdbGame->id,
-                'rating' => $gameReview['rating'] ?? null,
-                'review' => $gameReview['review'] ?? null,
-                'is_favorite' => $gameReview['is_favorite'] ?? false,
-                'status' => $gameReview['status'] ?? null,
+                'review' => $review ?? null,
+                'sentiment_score' => $sentiment_score,
             ]
         );
         return redirect()->route('games.show', ['id' => $igdbGame->id]);
     }
 
-    public function updateReview(GameReviewRequest $request, $id)
+    public function updateReview(ReviewRequest $request, $id)
     {
-        $gameReview = $request->validated();
-        $userGame = UserGame::find($id);
+        $validated = $request->validated();
+        $review = Review::find($id);
 
-        $userGame->rating = $gameReview['rating'] ?? $userGame->rating;
-        $userGame->review = $gameReview['review'] ?? $userGame->review;
-        $userGame->is_favorite = $gameReview['is_favorite'] ?? $userGame->is_favorite;
-        $userGame->status = $gameReview['status'];
-        $userGame->save();
-        return redirect()->route('games.show', ['id' => $userGame->igdb_id]);
+        $hasReview = !!$validated['content'];
+        $sentiment_score =  $hasReview ? $this->googleCloudService->reviewAnalyseSentiment($validated['content']) : 0;
+
+        $review->sentiment_score = $hasReview ? $sentiment_score : $review->sentiment_score;
+        $review->content = $validated['content'] ?? $review->content;
+        $review->save();
+        return redirect()->route('games.show', ['id' => $review->igdb_id]);
+    }
+
+    public function storeLikeReview(LikeReviewRequest $request)
+    {
+        $validated = $request->validated();
+        $user = $this->auth->user();
+        $review = Review::find($validated['review_id']);
+        $review->likes()->create(['user_id' => $user->id]);
+
+        return redirect()->back();
+
+    }
+
+    public function destroyLikeReview($id)
+    {
+
+        $reviewLike = ReviewLike::findOrFail($id);
+        $reviewLike->delete();
+        return redirect()->back();
     }
 }

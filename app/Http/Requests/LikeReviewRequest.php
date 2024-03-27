@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GameReviewRequest extends FormRequest
+class LikeReviewRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,7 @@ class GameReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'integer',
-            'rating' => 'integer|min:1|max:5',
-            'review' => 'string',
-            'is_favorite' => 'boolean',
-            'status' => 'string|in:wishlisted,completed,playing,played,dropped|nullable',
+            'review_id' => 'required|uuid',
         ];
     }
 }

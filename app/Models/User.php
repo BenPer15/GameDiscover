@@ -72,9 +72,19 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function games()
+    public function reviews()
     {
-        return $this->hasMany(UserGame::class);
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the games for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function gameInteraction()
+    {
+        return $this->hasMany(UserGameInteraction::class);
     }
 
     /**

@@ -17,9 +17,10 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::post('/review', [GameController::class, 'storeReview'])->name('games.storeReview');
     Route::put('/review/{id}', [GameController::class, 'updateReview'])->name('games.updateReview');
     Route::delete('/review/{id}', [GameController::class, 'destroyReview'])->name('games.destroyReview');
-    Route::post('/status', [GameController::class, 'storeStatus'])->name('games.storeStatus');
-    Route::put('/status/{id}', [GameController::class, 'updateStatus'])->name('games.updateStatus');
-
+    Route::post('/status', [GameController::class, 'storeUserGameInteraction'])->name('games.storeStatus');
+    Route::put('/status/{id}', [GameController::class, 'updateUserGameInteraction'])->name('games.updateStatus');
+    Route::post('/like', [GameController::class, 'storeLikeReview'])->name('games.review.storeLike');
+    Route::post('/like/{id}', [GameController::class, 'destroyLikeReview'])->name('games.review.destroyLike');
 });
 
 

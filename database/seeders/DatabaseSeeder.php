@@ -23,12 +23,15 @@ class DatabaseSeeder extends Seeder
             'genres' => '[]',
             'mode' => '[]',
         ]);
-        $user->games()->create([
+        $user->reviews()->create([
             'igdb_id' => 987,
-            'rating' => 4,
-            'review' => "I really enjoyed this game. It's a great game to play with friends.",
-            'is_favorite' => true,
-            'status' => 'played',
+            'content' => "I really enjoyed this game. It's a great game to play with friends.",
+            'sentiment_score' => 80,
+        ]);
+        $user->gameInteraction()->create([
+            'igdb_id' => 987,
+            'is_favorite' => false,
+            'status' => 'completed',
         ]);
     }
 }

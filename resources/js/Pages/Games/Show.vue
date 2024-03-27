@@ -9,7 +9,9 @@ import Reviews from "@/Components/Reviews/Index.vue";
 import ShowMore from "@/Components/ShowMore.vue";
 import TwitchLive from "@/Components/TwitchLive.vue";
 
-import GameActions from "./Partials/Actions/Index.vue";
+import { useScore } from "@/Composables/useScore";
+
+import GameInteractions from "./Partials/GameInteractions/Index.vue";
 import GameInfo from "./Partials/Info/Index.vue";
 
 const props = defineProps({
@@ -24,6 +26,10 @@ const getDeveloper = () => {
 const showGallery = () => {
     return props.game.medias.length > 0;
 };
+
+const { scoreColor, scoreLabel, scoreIcon } = useScore(
+    props.game.sentimentsScore.total
+);
 </script>
 
 <template>
@@ -57,19 +63,47 @@ const showGallery = () => {
                     <PrimaryButton class="w-full capitalize"
                         >Discover this game</PrimaryButton
                     >
-                    <GameActions :game="game" />
+                    <GameInteractions
+                        :gameUserInteractions="game.gameUserInteractions"
+                        :igdbId="game.id"
+                    />
                 </div>
 
                 <div class="flex flex-col w-full gap-4 mt-12">
-                    <h1 class="text-4xl font-bold gameDetail_title">
-                        {{ game.name }}
-                    </h1>
-                    <p class="text-base">
-                        Released on
-                        <span class="font-bold">{{ game.release_date }}</span>
-                        by
-                        <span class="font-bold">{{ getDeveloper() }}</span>
-                    </p>
+                    <div class="flex items-start justify-between gap-5">
+                        <div class="w-2/3">
+                            <h1 class="text-4xl font-bold gameDetail_title">
+                                {{ game.name }}
+                            </h1>
+                            <p class="text-base">
+                                Released on
+                                <span class="font-bold">{{
+                                    game.release_date
+                                }}</span>
+                                by
+                                <span class="font-bold">{{
+                                    getDeveloper()
+                                }}</span>
+                            </p>
+                        </div>
+                        <div
+                            v-if="game.total_sentiment_score"
+                            class="flex items-center justify-center w-1/3"
+                        >
+                            <div
+                                class="flex flex-col items-center justify-center w-24 h-24 gap-1 font-bold border-4 rounded-full"
+                                :class="
+                                    'border-' +
+                                    scoreColor +
+                                    ' text-' +
+                                    scoreColor
+                                "
+                            >
+                                <i class="text-2xl bx" :class="scoreIcon" />
+                                <span> {{ scoreLabel }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="flex justify-between w-full gap-5 mt-5">
                         <div class="flex flex-col w-2/3 gap-4">
@@ -80,8 +114,8 @@ const showGallery = () => {
                             />
 
                             <Reviews
-                                :review="game?.reviews"
-                                :gameId="game?.id"
+                                :reviews="game.reviews"
+                                :gameId="game.id"
                             />
                         </div>
 

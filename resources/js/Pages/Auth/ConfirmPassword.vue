@@ -1,8 +1,8 @@
 <script setup>
-import GuestLayout from "@/Layouts/AuthLayout.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import GuestLayout from "@/Layouts/AuthLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 
 const form = useForm({
