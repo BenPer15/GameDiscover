@@ -71,6 +71,8 @@ class GameController extends Controller
                 'is_favorite' => $validated['is_favorite'] ?? false,
             ]
         );
+
+
     }
 
     public function updateUserGameInteraction(UserGameInteractionRequest $request, $id)
@@ -80,9 +82,10 @@ class GameController extends Controller
         $userGameInteraction->update(
             [
                 'status' => $validated['status'],
-                'is_favorite' => $validated['is_favorite'],
+                'is_favorite' => $validated['is_favorite'] ?? $userGameInteraction->is_favorite,
             ]
         );
+
     }
 
 

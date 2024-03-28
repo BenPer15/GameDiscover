@@ -16,22 +16,14 @@ const setStatus = (status) => {
         igdb_id: props.igdbId,
     };
     if (gUI.value.currentUser) {
-        router.put(
-            route("games.updateStatus", gUI.value.currentUser.id),
-            data,
-            {
-                only: ["gameUserInteraction"],
-            }
-        );
+        router.put(route("games.updateStatus", gUI.value.currentUser.id), data);
     } else {
-        router.post(route("games.storeStatus"), data, {
-            only: ["gameUserInteraction"],
-        });
+        router.post(route("games.storeStatus"), data);
     }
 };
 
 onUpdated(() => {
-    gUI.value = usePage().props.gameUserInteraction;
+    gUI.value = usePage().props.game.gameUserInteractions;
 });
 </script>
 
