@@ -9,6 +9,7 @@ const props = defineProps({
 
 const page = usePage();
 const auth = computed(() => page.props.auth);
+const countLikes = computed(() => props.likes.length);
 
 const userLikedReview = computed(() =>
     props.likes.find((like) => like.user_id === auth.value.user.id)
@@ -19,10 +20,14 @@ const likeReview = () => {
         router.post(
             route("games.review.destroyLike", userLikedReview.value.id)
         );
+        userLikedReview.value = false;
+        countLikes.value -= 1;
     } else {
         router.post(route("games.review.storeLike"), {
             review_id: props.review_id,
         });
+        userLikedReview.value = true;
+        countLikes.value += 1;
     }
 };
 </script>
@@ -36,6 +41,6 @@ const likeReview = () => {
         <i v-if="!!userLikedReview" class="bx bxs-heart"></i>
         <i v-else class="bx bx-heart"></i>
 
-        <span>{{ likes.length }} Likes</span>
+        <span>{{ countLikes }} Likes</span>
     </button>
 </template>

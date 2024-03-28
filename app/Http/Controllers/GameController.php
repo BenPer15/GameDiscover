@@ -126,7 +126,11 @@ class GameController extends Controller
         $review = Review::find($validated['review_id']);
         $review->likes()->create(['user_id' => $user->id]);
 
-        return redirect()->back();
+        return redirect()->back()->with([
+            'type' => 'success',
+            'message' => 'Like added successfully',
+        ]);
+        ;
 
     }
 
@@ -135,6 +139,10 @@ class GameController extends Controller
 
         $reviewLike = ReviewLike::findOrFail($id);
         $reviewLike->delete();
-        return redirect()->back();
+        return redirect()->back()->with([
+            'type' => 'success',
+            'message' => 'Like deleted successfully',
+        ]);
+        ;
     }
 }

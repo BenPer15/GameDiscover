@@ -1,5 +1,15 @@
 <script setup>
 import Nav from "@/Components/Nav.vue";
+import { usePage } from "@inertiajs/vue3";
+import { ref, watch } from "vue";
+
+const flashes = ref([]);
+watch(
+    () => usePage().props.flash,
+    (next) => {
+        flashes.value.push(next);
+    }
+);
 </script>
 
 <template>
@@ -12,4 +22,11 @@ import Nav from "@/Components/Nav.vue";
         </div>
     </main>
     <footer></footer>
+    <flash-message
+        v-if="flashes.length > 0"
+        v-for="(flash, index) in flashes"
+        :key="index"
+        :message="flash.message"
+        :type="flash.type"
+    />
 </template>

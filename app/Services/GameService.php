@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Review;
-use App\Models\UserGame;
 use App\Models\UserGameInteraction;
 use Carbon\Carbon;
 use Exception;
