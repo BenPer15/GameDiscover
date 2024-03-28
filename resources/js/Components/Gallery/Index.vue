@@ -1,5 +1,5 @@
 <script setup>
-import Image from "@/Components/Image.vue";
+import Media from "@/Components/Media.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { useGallery } from "@/Composables/useGallery";
 import Modal from "./Modal.vue";
@@ -74,11 +74,7 @@ const {
                     'media-item--third': index === 2,
                 }"
             >
-                <Image
-                    :src="media.url"
-                    :alt="'media-' + index"
-                    :text="media.type"
-                />
+                <Media :media="media" />
             </div>
         </div>
     </div>
@@ -86,7 +82,7 @@ const {
     <Modal
         :show="showModal"
         :close="closeModal"
-        :src="medias[currentImageIndex]?.url"
+        :media="medias[currentImageIndex]"
         :currentImageIndex="currentImageIndex"
         :prevImageModal="prevImageModal"
         :nextImageModal="nextImageModal"

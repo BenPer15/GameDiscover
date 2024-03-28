@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection ;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Fluent;
 use MarcReichel\IGDBLaravel\Enums\Image\Size;
 use MarcReichel\IGDBLaravel\Models\Artwork;
 use MarcReichel\IGDBLaravel\Models\Game as IGDBGame;
@@ -62,9 +63,9 @@ class GameService
 
     public function find($id): IGDBGame
     {
-        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes'])
+        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes', 'videos'])
             ->where('id', '=', $id)
-            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes'])
+            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes', 'videos'])
             ->first();
 
         if (!$game) {
@@ -72,13 +73,13 @@ class GameService
         }
 
         $reviews = $this->getReviews($game->id);
-        $images = $this->getImagesOfGame($game);
+        $medias = $this->getMedias($game);
         $game->reviews = $reviews['reviews'] ?? [];
         $game->sentimentsScore = $reviews['sentimentScore'];
         $game->gameUserInteractions = $this->getGameUserInteractions($game->id);
         $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
-        $game->medias = $images;
-        $game->background = $this->getBackgroundOfGame($images);
+        $game->medias = $medias;
+        $game->background = $this->getBackgroundOfGame($medias);
         $game->stream = $this->getStream($game['id']);
         $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
         $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
@@ -131,8 +132,9 @@ class GameService
     }
 
 
-    private function getImagesOfGame($game): Collection
+    private function getMedias($game): Collection
     {
+        $videos = $game->videos;
         $images = collect();
         $screenshots = $game->screenshots;
         if ($screenshots && $screenshots->isNotEmpty()) {
@@ -158,7 +160,7 @@ class GameService
                 ];
             }, $artworks));
         }
-        return $images;
+        return $videos->concat($images);
     }
 
     private function getCompaniesOfGame($involvedCompanies): Collection

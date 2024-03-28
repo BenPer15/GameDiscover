@@ -5,19 +5,44 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 defineProps({
     show: Boolean,
     close: Function,
-    src: String,
+    media: Object,
     index: Number,
     currentImageIndex: Number,
     prevImageModal: Function,
     nextImageModal: Function,
     length: Number,
 });
+const origin = window.location.origin;
 </script>
 
 <template>
     <Modal :show="show" @close="close">
         <section class="flex m-auto bg-white">
-            <img :src="src" :alt="'modal-image-' + index" class="p-4" />
+            <img
+                v-if="media.url"
+                :src="media.url"
+                :alt="'modal-image-' + index"
+                class="p-4"
+            />
+
+            <div v-else class="flex items-center justify-center w-full h-96">
+                <iframe
+                    id="video_3_Youtube_api"
+                    frameborder="0"
+                    allowfullscreen=""
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    :title="media.name"
+                    width="640"
+                    height="360"
+                    :src="
+                        'https://www.youtube.com/embed/' +
+                        media.video_id +
+                        '?controls=0&modestbranding=1&rel=0&showinfo=0&loop=0&fs=0&hl=en&iv_load_policy=3&enablejsapi=1&widgetid=1&origin=' +
+                        origin +
+                        '&autoplay=1'
+                    "
+                ></iframe>
+            </div>
 
             <SecondaryButton
                 v-if="currentImageIndex > 0"
