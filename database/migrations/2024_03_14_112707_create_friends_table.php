@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('friends', function (Blueprint $table) {
             $table->uuid('id');
             $table->foreignId('user_id')->constrained()->delete('cascade');
-            $table->foreignUuid('friend_id')->constrained('users')->delete('cascade');
+            $table->foreignId('friend_id')->constrained('users')->delete('cascade');
             $table->timestamps();
         });
     }

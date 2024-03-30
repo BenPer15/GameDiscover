@@ -14,8 +14,6 @@ const isExpanded = ref(props.text.length <= props.maxLength || false);
 const toggle = () => {
     isExpanded.value = !isExpanded.value;
 };
-
-console.log();
 </script>
 
 <template>

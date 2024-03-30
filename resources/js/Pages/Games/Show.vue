@@ -92,7 +92,8 @@ const { scoreColor, scoreLabel, scoreIcon } = useScore(
                         >
                             <div
                                 class="flex flex-col items-center justify-center w-24 h-24 gap-1 font-bold border-4 rounded-full"
-                                :class="'border-' +
+                                :class="
+                                    'border-' +
                                     scoreColor +
                                     ' text-' +
                                     scoreColor

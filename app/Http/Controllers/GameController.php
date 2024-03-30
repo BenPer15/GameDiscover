@@ -93,19 +93,32 @@ class GameController extends Controller
     {
         $validated = $request->validated();
         $review = $validated['content'];
+        $igdb_id = $validated['igdb_id'];
         $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($review);
         $user = $this->auth->user();
-        $igdbGame = $this->gameService->find((int)$validated['igdb_id']);
+        $igdbGame = $this->gameService->find((int)$igdb_id);
+
+        if (!$igdbGame) {
+            return redirect()->back()->with([
+                'type' => 'error',
+                'message' => 'Game not found',
+            ]);
+        }
 
         Review::create(
             [
                 'user_id' => $user->id,
-                'igdb_id' => $igdbGame->id,
-                'review' => $review ?? null,
+                'igdb_id' => $igdb_id,
+                'content' => $review ?? null,
                 'sentiment_score' => $sentiment_score,
             ]
         );
-        return redirect()->route('games.show', ['id' => $igdbGame->id]);
+
+        return redirect()->back()->with([
+            'type' => 'success',
+            'message' => 'Your review has been added successfully',
+        ]);
+
     }
 
     public function updateReview(ReviewRequest $request, $id)
@@ -133,7 +146,6 @@ class GameController extends Controller
             'type' => 'success',
             'message' => 'Like added successfully',
         ]);
-        ;
 
     }
 
@@ -146,6 +158,7 @@ class GameController extends Controller
             'type' => 'success',
             'message' => 'Like deleted successfully',
         ]);
-        ;
+
+
     }
 }

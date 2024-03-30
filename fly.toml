@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for epichaven on 2024-03-24T13:26:31+01:00
+# fly.toml app configuration file generated for epichaven on 2024-03-29T23:45:41+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -14,13 +14,16 @@ console_command = 'php /var/www/html/artisan tinker'
 
 [env]
   APP_ENV = 'production'
-  DB_CONNECTION = "pgsql"
+  APP_URL = 'https://epichaven.fly.dev/'
+  DB_CONNECTION = 'pgsql'
+  DB_HOST = "epichaven-pg.internal"
+  DB_PORT = "5432"
+  DB_DATABASE = "epichaven"
   LOG_CHANNEL = 'stderr'
   LOG_LEVEL = 'info'
   LOG_STDERR_FORMATTER = 'Monolog\Formatter\JsonFormatter'
   SESSION_DRIVER = 'cookie'
   SESSION_SECURE_COOKIE = 'true'
-  APP_URL = "https://epichaven.fly.dev"
 
 [http_service]
   internal_port = 8080
@@ -29,6 +32,14 @@ console_command = 'php /var/www/html/artisan tinker'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
+
+[processes]
+  app=""
+  cron = "cron -f"
+  worker = "php artisan queue:listen"
+
+[deploy]
+  release_command = 'php /var/www/html/artisan migrate --force'
 
 [[vm]]
   memory = '1gb'

@@ -4,12 +4,12 @@ return [
     /*
      * The Client ID to use for requests.
      */
-    'client_id' => env('TWITCH_HELIX_KEY'),
+    'client_id' => env('TWITCH_CLIENT_ID'),
 
     /*
      * The Client Secret to use for OAuth requests.
      */
-    'client_secret' => env('TWITCH_HELIX_SECRET'),
+    'client_secret' => env('TWITCH_CLIENT_SECRET'),
 
     /*
      * The Redirect URI to use for generating OAuth authorization.

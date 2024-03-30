@@ -29,7 +29,7 @@ class GameService
                 ->limit(5)
                 ->get();
             return $igdbGames->map(function ($game) {
-                $game->coverImg = $game->cover->getUrl(Size::ORIGINAL) ?? 'https://via.placeholder.com/264x352?text=No+Cover';
+                $game->coverImg = $game->cover->getUrl(Size::HD) ?? 'https://via.placeholder.com/264x352?text=No+Cover';
                 $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
                 return $game;
             });
@@ -51,7 +51,7 @@ class GameService
                 ->all();
             return $igdbGames->map(function ($game) {
                 $game->total_rating = 'N/A';
-                $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
+                $game->coverImg = $game->cover ? $game->cover->getUrl(Size::HD) : 'https://via.placeholder.com/264x352?text=No+Cover';
                 $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
                 return $game;
             });
@@ -81,7 +81,7 @@ class GameService
         $game->medias = $medias;
         $game->background = $this->getBackgroundOfGame($medias);
         $game->stream = $this->getStream($game['id']);
-        $game->coverImg = $game->cover ? $game->cover->getUrl(Size::ORIGINAL) : 'https://via.placeholder.com/264x352?text=No+Cover';
+        $game->coverImg = $game->cover ? $game->cover->getUrl(Size::HD) : 'https://via.placeholder.com/264x352?text=No+Cover';
         $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
         $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
         return $game;
@@ -140,7 +140,7 @@ class GameService
         if ($screenshots && $screenshots->isNotEmpty()) {
             $images = $images->concat($screenshots->map(function ($screenshot) {
                 return [
-                    'url' => $screenshot->getUrl(Size::ORIGINAL),
+                    'url' => $screenshot->getUrl(Size::HD),
                     'type' => 'screenshot',
                     'hd' => $screenshot->height > 720 && $screenshot->height < 1080,
                     'fullHd' => $screenshot->height >= 1080
@@ -153,7 +153,7 @@ class GameService
             $images = $images->concat(array_map(function ($artwork) {
 
                 return [
-                   'url' =>  Artwork::find($artwork['id'])->getUrl(Size::ORIGINAL),
+                   'url' =>  Artwork::find($artwork['id'])->getUrl(Size::HD),
                    'type' => 'artwork',
                    'hd' => $artwork['height'] > 720,
                 'fullHd' => $artwork['height'] > 1080

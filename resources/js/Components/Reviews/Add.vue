@@ -15,13 +15,13 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 
 const form = reactive({
-    review: null,
-    id: props.gameId,
+    content: null,
+    igdb_id: props.gameId,
 });
 
 const userReview = computed(() => {
-    return auth.value.user.games.find(
-        ({ igdb_id }) => igdb_id === props.gameId
+    return page.props.game.reviews.find(
+        ({ user }) => user.id === auth.value.user.id
     );
 });
 
@@ -50,7 +50,7 @@ function submit() {
             class="w-8 h-8 rounded-full"
         />
 
-        <TextInput v-model="form.review" placeholder="Add your review" />
+        <TextInput v-model="form.content" placeholder="Add your review" />
         <PrimaryButton
             type="submit"
             class="flex items-center justify-center w-8 h-8 !rounded-full"

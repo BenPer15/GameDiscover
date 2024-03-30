@@ -16,28 +16,15 @@ defineProps({
 <template>
     <Head title="Home" />
     <BasicLayout>
-        <header class="w-full h-96">
-            <div class="top-0 max-w-7xl p-4 mx-auto">
-                <HeroSection />
-            </div>
-        </header>
-        <main class="w-full">
-            <div class="grid max-w-7xl grid-cols-3 p-4 mx-auto">
-                <div class="flex flex-col items-center justify-center">
-                    <h2 class="text-xl font-bold text-center">
-                        Top-Rated Games
-                    </h2>
+        <main>
+            <header class="w-full h-96">
+                <div class="top-0 p-4 mx-auto max-w-7xl">
+                    <HeroSection />
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                    <h2 class="text-xl font-bold text-center">
-                        Personalized Game Recommendations
-                    </h2>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <h2 class="text-xl font-bold text-center">User Reviews</h2>
-                </div>
-            </div>
+            </header>
+            <article class="relative">
+                <section></section>
+            </article>
         </main>
-        <footer></footer>
     </BasicLayout>
 </template>

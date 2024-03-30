@@ -7,8 +7,6 @@ const props = defineProps({
 });
 const origin = window.location.origin;
 const isHover = ref(false);
-
-console.log(props.media);
 </script>
 
 <template>

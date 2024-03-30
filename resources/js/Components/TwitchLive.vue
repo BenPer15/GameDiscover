@@ -10,6 +10,7 @@ defineProps({
         default: 550,
     },
 });
+const parent = window.location.hostname;
 </script>
 
 <template>
@@ -19,7 +20,9 @@ defineProps({
             :src="
                 'https://player.twitch.tv/?channel=' +
                 stream.user_name +
-                '&html5&parent=epichaven.test&muted=false'
+                '&html5&parent=' +
+                parent +
+                '&muted=false'
             "
             :height="height"
             :width="width"

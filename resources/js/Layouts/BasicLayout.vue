@@ -16,11 +16,10 @@ watch(
     <header>
         <Nav />
     </header>
-    <main role="main" class="h-auto pb-4">
-        <div class="h-auto mx-auto max-w-7xl">
-            <slot />
-        </div>
-    </main>
+    <div class="max-w-full">
+        <slot />
+    </div>
+
     <footer></footer>
     <flash-message
         v-if="flashes.length > 0"
