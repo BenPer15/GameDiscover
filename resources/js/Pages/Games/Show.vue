@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import BasicLayout from "@/Layouts/BasicLayout.vue";
 
 import Gallery from "@/Components/Gallery/Index.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import GameCover from "@/Components/GameCover.vue";
 import Reviews from "@/Components/Reviews/Index.vue";
 import ShowMore from "@/Components/ShowMore.vue";
 import TwitchLive from "@/Components/TwitchLive.vue";
@@ -48,21 +48,7 @@ const { scoreColor, scoreLabel, scoreIcon } = useScore(
         <div class="relative flex px-3 mx-auto max-w-7xl">
             <div class="flex w-full gap-6 mt-48">
                 <div class="flex flex-col items-center w-1/6 gap-4">
-                    <div
-                        class="relative overflow-hidden rounded-md shadow w-44 h-60"
-                    >
-                        <div
-                            class="absolute z-10 w-full h-full rounded-md gameCard__border"
-                        />
-                        <img
-                            :src="game.coverImg"
-                            :alt="game.title"
-                            class="object-cover w-full h-full"
-                        />
-                    </div>
-                    <PrimaryButton class="w-full capitalize"
-                        >Discover this game</PrimaryButton
-                    >
+                    <GameCover :url="game.coverImg" :title="game.name" />
                     <GameInteractions
                         :gameUserInteractions="game.gameUserInteractions"
                         :igdbId="game.id"
@@ -92,8 +78,7 @@ const { scoreColor, scoreLabel, scoreIcon } = useScore(
                         >
                             <div
                                 class="flex flex-col items-center justify-center w-24 h-24 gap-1 font-bold border-4 rounded-full"
-                                :class="
-                                    'border-' +
+                                :class="'border-' +
                                     scoreColor +
                                     ' text-' +
                                     scoreColor

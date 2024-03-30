@@ -29,10 +29,11 @@ defineExpose({ focus: () => input.value.focus() });
 <template>
     <div
         class="flex items-center w-full gap-2 text-white shadow-sm rounded-xl bg-dark-light"
+        :class="class"
     >
         <i v-if="icon" :class="icon" class="ml-4 text-xs bx" />
         <input
-            class="w-full text-xs font-normal bg-transparent border-none focus:border-transparent focus:ring-0 placeholder:text-white placeholder:text-xs"
+            class="w-full text-xs font-normal bg-transparent border-none focus:border-transparent focus:ring-0 placeholder:text-gray-400 placeholder:text-xs"
             v-model="model"
             :type="type"
             :placeholder="placeholder"

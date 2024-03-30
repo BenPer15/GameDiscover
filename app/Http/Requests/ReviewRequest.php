@@ -23,6 +23,7 @@ class ReviewRequest extends FormRequest
     {
         return [
             'igdb_id' => 'required|integer',
+            'platform' => 'string|nullable',
             'content' => 'required|string',
         ];
     }

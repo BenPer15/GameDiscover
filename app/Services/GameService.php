@@ -21,7 +21,11 @@ class GameService
     public function search(string $gameName): Collection
     {
         try {
-            $igdbGames = IGDBGame::fuzzySearch(['name'], $gameName)
+            if($gameName === null) {
+                throw new Exception('Game name is required');
+            }
+            $igdbGames = IGDBGame::where('name', $gameName)
+                ->orWhere('name', 'ilike', '%' . $gameName . '%')
                 ->where('platforms', '!=', null)
                 ->select(['id', 'name', 'platforms', 'cover', 'first_release_date'])
                 ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
@@ -43,12 +47,13 @@ class GameService
     public function searchGame($gameName, $orderBy, $asc): Collection
     {
         try {
-            $igdbGames = IGDBGame::fuzzySearch(['name'], $gameName)
-                ->where('platforms', '!=', null)
-                ->select([ 'id', 'name', 'platforms', 'cover', 'first_release_date'])
-                ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
-                ->orderBy($orderBy ?? 'total_rating', $asc ? 'asc' : 'desc')
-                ->all();
+            $igdbGames = IGDBGame::where('name', $gameName)
+               ->orWhere('name', 'ilike', '%' . $gameName . '%')
+               ->where('platforms', '!=', null)
+               ->select([ 'id', 'name', 'platforms', 'cover', 'first_release_date'])
+               ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
+               ->orderBy($orderBy ?? 'total_rating', $asc ? 'asc' : 'desc')
+               ->all();
             return $igdbGames->map(function ($game) {
                 $game->total_rating = 'N/A';
                 $game->coverImg = $game->cover ? $game->cover->getUrl(Size::HD) : 'https://via.placeholder.com/264x352?text=No+Cover';

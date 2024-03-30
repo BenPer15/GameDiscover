@@ -16,6 +16,8 @@ return new class () extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->integer('sentiment_score')->nullable()->index();
             $table->text('content')->nullable();
+            $table->string('platform')->nullable();
+            $table->boolean('is_spoiler')->default(false);
             $table->timestamps();
         });
     }

@@ -16,7 +16,7 @@ const removeReview = () => {
     if (!isReviewOwner.value) return;
 
     if (confirm("Are you sure you want to delete this review?")) {
-        router.delete(route("games.deleteReview", { review: props.id }));
+        router.delete(route("games.destroyReview", props.review.id));
     }
 };
 

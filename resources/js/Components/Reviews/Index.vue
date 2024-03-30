@@ -1,6 +1,8 @@
 <script setup>
+import Modal from "@/Components/Modal.vue";
 import { Link, usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import PrimaryButton from "../PrimaryButton.vue";
 import Add from "./Add.vue";
 import Review from "./Review.vue";
 
@@ -11,11 +13,20 @@ const props = defineProps({
     reviews: Array,
     gameId: Number,
 });
+const showAddReviewModal = ref(false);
 
 const currentUserHasReview = computed(
     () =>
         !!props.reviews.find((review) => review.user.id === auth.value.user.id)
 );
+
+const openAddReviewModal = () => {
+    showAddReviewModal.value = true;
+};
+
+const closeModal = () => {
+    showAddReviewModal.value = null;
+};
 </script>
 
 <template>
@@ -36,7 +47,9 @@ const currentUserHasReview = computed(
             >
         </p>
 
-        <Add v-if="!currentUserHasReview" :gameId="gameId" />
+        <PrimaryButton v-if="!currentUserHasReview" @click="openAddReviewModal">
+            Write a review
+        </PrimaryButton>
     </div>
     <div v-else>
         <p class="text-sm">
@@ -44,4 +57,10 @@ const currentUserHasReview = computed(
             to share your review with the community.
         </p>
     </div>
+
+    <Modal :show="showAddReviewModal" @close="closeModal">
+        <section class="flex w-full m-auto bg-dark-light">
+            <Add :gameId="gameId" :closeModal="closeModal" />
+        </section>
+    </Modal>
 </template>

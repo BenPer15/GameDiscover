@@ -15,7 +15,7 @@ defineProps({
 <template>
     <button
         :type="type"
-        class="inline-flex items-center uppercase transition duration-150 ease-in-out rounded-lg shadow-sm bg-dark-light disabled:opacity-25 hover:bg-gray-300 hover:text-dark focus:outline-none focus:ring-gray-300 focus:ring-opacity-ring-opacity-50"
+        class="p-3 text-xs font-bold text-white uppercase transition duration-150 ease-in-out border border-transparent rounded-lg shadow-sm bg-dark-light hover:bg-gray-300 hover:text-dark"
         :class="class"
         v-bind:class="{
             'bg-gray-300 text-dark': active,

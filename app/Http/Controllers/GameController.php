@@ -71,8 +71,6 @@ class GameController extends Controller
                 'is_favorite' => $validated['is_favorite'] ?? false,
             ]
         );
-
-
     }
 
     public function updateUserGameInteraction(UserGameInteractionRequest $request, $id)
@@ -85,7 +83,6 @@ class GameController extends Controller
                 'is_favorite' => $validated['is_favorite'] ?? $userGameInteraction->is_favorite,
             ]
         );
-
     }
 
 
@@ -94,6 +91,7 @@ class GameController extends Controller
         $validated = $request->validated();
         $review = $validated['content'];
         $igdb_id = $validated['igdb_id'];
+        $platform = $validated['platform'];
         $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($review);
         $user = $this->auth->user();
         $igdbGame = $this->gameService->find((int)$igdb_id);
@@ -104,21 +102,19 @@ class GameController extends Controller
                 'message' => 'Game not found',
             ]);
         }
-
         Review::create(
             [
                 'user_id' => $user->id,
                 'igdb_id' => $igdb_id,
                 'content' => $review ?? null,
+                'platform' => $platform ?? null,
                 'sentiment_score' => $sentiment_score,
             ]
         );
-
         return redirect()->back()->with([
             'type' => 'success',
             'message' => 'Your review has been added successfully',
         ]);
-
     }
 
     public function updateReview(ReviewRequest $request, $id)
@@ -133,6 +129,16 @@ class GameController extends Controller
         $review->content = $validated['content'] ?? $review->content;
         $review->save();
         return redirect()->route('games.show', ['id' => $review->igdb_id]);
+    }
+
+    public function destroyReview($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->delete();
+        return redirect()->back()->with([
+            'type' => 'success',
+            'message' => 'Review deleted successfully',
+        ]);
     }
 
     public function storeLikeReview(LikeReviewRequest $request)
