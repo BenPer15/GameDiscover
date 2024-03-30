@@ -3,7 +3,6 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
 import GameCover from "../GameCover.vue";
-import InputError from "../InputError.vue";
 import InputLabel from "../InputLabel.vue";
 import PrimaryButton from "../PrimaryButton.vue";
 import SecondaryButton from "../SecondaryButton.vue";
@@ -39,14 +38,18 @@ function submit() {
         form.put(route("games.updateReview", props.editedReview.id), {
             onFinish: () => {
                 loadingSave.value = false;
-                props.closeModal();
+            },
+            onSuccess: () => {
+                closeModal();
             },
         });
     } else {
         form.post(route("games.storeReview"), {
             onFinish: () => {
                 loadingSave.value = false;
-                props.closeModal();
+            },
+            onSuccess: () => {
+                closeModal();
             },
         });
     }
@@ -79,42 +82,51 @@ function submit() {
                     <InputLabel
                         for="platform"
                         value="Platform"
-                        class="text-xs text-white"
-                    />
-                    <select
-                        class="w-full gap-2 text-xs font-normal text-white border-none shadow-sm rounded-xl bg-dark-lighter focus:border-transparent focus:ring-0"
-                        id="platform"
-                        v-model="form.platform"
+                        class="text-xs text-white bg-dark-light"
                     >
-                        <option :value="null" disabled selected>
-                            Select a platform
-                        </option>
-                        <option
-                            v-for="platform in page.props.game.platforms"
-                            :value="platform.abbreviation"
-                            :key="platform.id"
+                        <select
+                            class="relative w-full py-3 my-3 text-xs bg-transparent rounded-md border-dark-lighter focus:border-dark-lighter focus:ring-0 placeholder:text-gray-400 placeholder:text-xs"
+                            id="platform"
+                            v-model="form.platform"
                         >
-                            {{ platform.abbreviation }}
-                        </option>
-                    </select>
+                            <option :value="null" disabled selected>
+                                Select a platform
+                            </option>
+                            <option
+                                v-for="platform in page.props.game.platforms"
+                                :value="platform.abbreviation"
+                                :key="platform.id"
+                            >
+                                {{ platform.abbreviation }}
+                            </option>
+                        </select>
+                    </InputLabel>
                 </div>
 
                 <div class="w-full">
                     <InputLabel
                         for="content"
                         value="Review"
-                        class="text-xs text-white"
-                    />
-                    <textarea
-                        class="w-full gap-2 text-xs font-normal text-white border-none shadow-sm resize-none rounded-xl bg-dark-lighter focus:border-transparent focus:ring-0 placeholder:text-gray-400 placeholder:text-xs"
-                        id="content"
-                        type="textarea"
-                        v-model="form.content"
-                        rows="5"
-                        onInput="this.parentNode.dataset.clonedVal = this.value"
-                        placeholder="Share your thoughts about this game"
-                    />
-                    <InputError class="mt-2" :message="form.errors.content" />
+                        class="text-xs text-white bg-dark-light"
+                    >
+                        <textarea
+                            class="relative w-full py-3 my-3 text-xs bg-transparent rounded-md border-dark-lighter focus:border-dark-lighter focus:ring-0 placeholder:text-gray-400 placeholder:text-x"
+                            id="content"
+                            type="textarea"
+                            v-model="form.content"
+                            rows="5"
+                            onInput="this.parentNode.dataset.clonedVal = this.value"
+                            placeholder="Share your thoughts about this game"
+                        />
+                    </InputLabel>
+                </div>
+
+                <div v-if="Object.keys(form.errors).length">
+                    <ul class="text-xs text-red-500">
+                        <li v-for="error in form.errors" :key="error">
+                            {{ error }}
+                        </li>
+                    </ul>
                 </div>
             </div>
 

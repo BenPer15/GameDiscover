@@ -56,6 +56,7 @@ const searchGames = () => {
             @input="searchGames"
             placeholder="Search"
             icon="bx-search"
+            classInput="!bg-dark-light border-none text-white placeholder:!text-white placeholder:font-normal"
         />
         <div
             v-if="searchQuery.length > 0"

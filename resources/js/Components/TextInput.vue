@@ -8,6 +8,7 @@ const model = defineModel({
 
 defineProps({
     class: String,
+    classInput: String,
     type: String,
     icon: String,
     placeholder: String,
@@ -28,12 +29,13 @@ defineExpose({ focus: () => input.value.focus() });
 
 <template>
     <div
-        class="flex items-center w-full gap-2 text-white shadow-sm rounded-xl bg-dark-light"
+        class="relative flex items-center w-full gap-2 text-white rounded-xl"
         :class="class"
     >
         <i v-if="icon" :class="icon" class="ml-4 text-xs bx" />
         <input
-            class="w-full text-xs font-normal bg-transparent border-none focus:border-transparent focus:ring-0 placeholder:text-gray-400 placeholder:text-xs"
+            class="w-full py-3 my-3 text-xs bg-transparent rounded-md border-dark-lighter focus:border-dark-lighter focus:ring-0 placeholder:text-gray-400 placeholder:text-xs"
+            :class="classInput"
             v-model="model"
             :type="type"
             :placeholder="placeholder"

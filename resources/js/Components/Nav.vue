@@ -11,9 +11,11 @@ const auth = computed(() => page.props.auth);
 </script>
 
 <template>
-    <nav class="relative z-20 text-white">
+    <nav
+        class="relative z-20 text-white bg-gradient-to-b from-dark from-0% via-transparent via-100%"
+    >
         <div
-            class="flex items-center justify-between px-4 py-2 mx-auto mt-4 rounded-full max-w-7xl bg-dark"
+            class="flex items-center justify-between px-4 py-2 mx-auto rounded-full max-w-7xl"
         >
             <div class="flex items-center gap-4 font-bold">
                 <ApplicationLogo />
