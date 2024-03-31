@@ -10,6 +10,7 @@ watch(
         flashes.value.push(next);
     }
 );
+console.log(flashes);
 </script>
 
 <template>
@@ -25,7 +26,6 @@ watch(
         v-if="flashes.length > 0"
         v-for="(flash, index) in flashes"
         :key="index"
-        :message="flash.message"
-        :type="flash.type"
+        :flash="flash"
     />
 </template>

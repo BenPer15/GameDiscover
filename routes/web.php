@@ -30,6 +30,7 @@ Route::middleware('auth')->prefix('settings')->name('settings.')->group(function
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/security', [SettingsController::class, 'security'])->name('security.edit');
     Route::get('/advanced', [SettingsController::class, 'advanced'])->name('advanced');
+    Route::post('/birthdate', [ProfileController::class, 'storeBirthdate'])->name('profil.birthdate');
 });
 
 require __DIR__.'/auth.php';

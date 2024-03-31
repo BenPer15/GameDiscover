@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,7 +68,6 @@ class User extends Authenticatable
         return $this->hasOne(UserNotificationPreference::class);
     }
 
-
     /**
      * Get the games for the user.
      *
@@ -95,5 +96,10 @@ class User extends Authenticatable
     public function friends()
     {
         return $this->hasMany(Friend::class);
+    }
+
+    public function getAgeAttribute()
+    {
+        return Carbon::parse($this->attributes['birthdate'])->age;
     }
 }

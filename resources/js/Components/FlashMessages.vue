@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted, ref } from "vue";
-defineProps({
-    message: Object,
-    type: String,
+const props = defineProps({
+    flash: Object,
 });
 
 const showNotif = ref(false);
 
 onMounted(() => {
+    if (props.flash.type === null) return;
     showNotif.value = true;
     setTimeout(() => {
         showNotif.value = false;
@@ -24,9 +24,9 @@ onMounted(() => {
             >
                 <i
                     class="text-xl bx"
-                    :class="type === 'success' ? 'bx-check' : 'bxs-error'"
+                    :class="flash.type === 'success' ? 'bx-check' : 'bxs-error'"
                 ></i>
-                {{ message }}
+                {{ flash.message }}
             </p>
         </Transition>
     </div>

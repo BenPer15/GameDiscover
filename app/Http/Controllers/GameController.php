@@ -8,11 +8,14 @@ use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\UserGameInteractionRequest;
 use App\Models\Review;
 use App\Models\ReviewLike;
+use App\Models\User;
 use App\Models\UserGameInteraction;
 use App\Services\GameService;
 use App\Services\GoogleCloudService;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class GameController extends Controller
@@ -53,9 +56,13 @@ class GameController extends Controller
         // return response()->json($games);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
+        $age = session('user_age', 0);
         $game = $this->gameService->find((int)$id);
+        if($game->matureContent && ($age < 18 || $age === 0)) {
+            return Inertia::render('MatureForm', ['game' => $game, 'age' => $age, 'matureSynopsis' => $game->matureContent['synopsis']]);
+        }
         return Inertia::render('Games/Show', ['game' => $game]);
     }
 
@@ -165,4 +172,6 @@ class GameController extends Controller
 
 
     }
+
+
 }

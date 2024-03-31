@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,7 +32,6 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
-
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
@@ -59,5 +60,26 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+
+    /**
+     * Store the user's birthdate.
+     */
+    public function storeBirthdate(Request $request)
+    {
+        $request->validate([
+            'birthdate' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+
+        if ($user && $user instanceof User) {
+            $user->birthdate = $request->birthdate;
+            $user->save();
+        }
+        $age = Carbon::parse($request->birthdate)->age;
+        session(['user_age' => $age]);
+        return redirect()->back();
     }
 }

@@ -70,9 +70,9 @@ class GameService
 
     public function find($id): IGDBGame
     {
-        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes', 'videos'])
+        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes', 'videos', 'age_ratings' , 'websites'])
             ->where('id', '=', $id)
-            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes', 'videos'])
+            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes', 'videos', 'age_ratings', 'websites'])
             ->first();
 
         if (!$game) {
@@ -81,6 +81,7 @@ class GameService
 
         $reviews = $this->getReviews($game->id);
         $medias = $this->getMedias($game);
+        $game->matureContent = $this->getMatureContent($game->age_ratings);
         $game->reviews = $reviews['reviews'] ?? [];
         $game->sentimentsScore = $reviews['sentimentScore'];
         $game->gameUserInteractions = $this->getGameUserInteractions($game->id);
@@ -92,6 +93,24 @@ class GameService
         $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
         $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
         return $game;
+    }
+
+    private function getMatureContent($ageRatings)
+    {
+        $listOfMatureRating = [4,5,11,12,16,17,21,22,26,32,33,37,38];
+        $matureRating = null;
+        if ($ageRatings && $ageRatings->isNotEmpty()) {
+            foreach ($ageRatings as $ageRating) {
+                if (in_array($ageRating['rating'], $listOfMatureRating)) {
+                    $matureRating = [
+                        'rating' => $ageRating['rating'],
+                        'synopsis' => $ageRating['synopsis']
+                    ];
+                    break;
+                }
+            }
+        }
+        return $matureRating;
     }
 
     private function getStream($gameId)

@@ -12,6 +12,7 @@ import TwitchLive from "@/Components/TwitchLive.vue";
 import { useScore } from "@/Composables/useScore";
 
 import GameInteractions from "./Partials/GameInteractions/Index.vue";
+import GameWebsites from "./Partials/GameWebsites/Index.vue";
 import GameInfo from "./Partials/Info/Index.vue";
 
 const props = defineProps({
@@ -53,6 +54,7 @@ const { scoreColor, scoreLabel, scoreIcon } = useScore(
                         :gameUserInteractions="game.gameUserInteractions"
                         :igdbId="game.id"
                     />
+                    <GameWebsites :websites="game.websites" />
                 </div>
 
                 <div class="flex flex-col w-full gap-4 mt-12">
@@ -78,7 +80,8 @@ const { scoreColor, scoreLabel, scoreIcon } = useScore(
                         >
                             <div
                                 class="flex flex-col items-center justify-center w-24 h-24 gap-1 font-bold border-4 rounded-full"
-                                :class="'border-' +
+                                :class="
+                                    'border-' +
                                     scoreColor +
                                     ' text-' +
                                     scoreColor
