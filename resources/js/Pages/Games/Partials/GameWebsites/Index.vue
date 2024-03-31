@@ -9,12 +9,13 @@ defineProps({
 <template>
     <div class="w-full">
         <h2 class="text-lg font-semibold">Websites</h2>
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="flex flex-col gap-2 mt-2">
             <a
-                v-for="website in websites"
+                v-for="website in websites.sort(
+                    (a, b) => a.category - b.category
+                )"
                 :key="website.id"
                 :href="website.url"
-                class="text-blue-500 hover:underline"
                 target="_blank"
             >
                 <Logo :category="website.category" />

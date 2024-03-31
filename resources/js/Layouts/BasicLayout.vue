@@ -17,7 +17,7 @@ console.log(flashes);
     <header>
         <Nav />
     </header>
-    <div class="max-w-full">
+    <div class="max-w-full pb-8">
         <slot />
     </div>
 
