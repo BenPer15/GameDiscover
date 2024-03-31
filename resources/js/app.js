@@ -1,3 +1,4 @@
+import '../css/animate.css';
 import '../css/app.css';
 import './bootstrap';
 

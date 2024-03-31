@@ -5,10 +5,10 @@ namespace App\Services;
 use App\Models\Review;
 use App\Models\UserGameInteraction;
 use Carbon\Carbon;
+use Error;
 use Exception;
 use Illuminate\Support\Collection ;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Fluent;
 use MarcReichel\IGDBLaravel\Enums\Image\Size;
 use MarcReichel\IGDBLaravel\Models\Artwork;
 use MarcReichel\IGDBLaravel\Models\Game as IGDBGame;
@@ -18,6 +18,8 @@ use romanzipp\Twitch\Twitch;
 
 class GameService
 {
+    protected const IMAGE_BASE_PATH = '//images.igdb.com/igdb/image/upload';
+
     public function search(string $gameName): Collection
     {
         try {
@@ -119,7 +121,6 @@ class GameService
 
     private function getBackgroundOfGame($images): string | null
     {
-
         $backgroundFullHD = $this->getRandomImageUrl($images, function ($image) {
             return $image['fullHd'];
         });
@@ -145,7 +146,7 @@ class GameService
         if ($screenshots && $screenshots->isNotEmpty()) {
             $images = $images->concat($screenshots->map(function ($screenshot) {
                 return [
-                    'url' => $screenshot->getUrl(Size::HD),
+                    'url' => $this->getImageUrl($screenshot),
                     'type' => 'screenshot',
                     'hd' => $screenshot->height > 720 && $screenshot->height < 1080,
                     'fullHd' => $screenshot->height >= 1080
@@ -158,10 +159,10 @@ class GameService
             $images = $images->concat(array_map(function ($artwork) {
 
                 return [
-                   'url' =>  Artwork::find($artwork['id'])->getUrl(Size::HD),
-                   'type' => 'artwork',
-                   'hd' => $artwork['height'] > 720,
-                'fullHd' => $artwork['height'] > 1080
+                    'url' =>  $this->getImageUrl(Artwork::find($artwork['id'])),
+                    'type' => 'artwork',
+                    'hd' => $artwork['height'] > 720,
+                    'fullHd' => $artwork['height'] > 1080
                 ];
             }, $artworks));
         }
@@ -173,6 +174,18 @@ class GameService
         return collect($involvedCompanies)->map(function ($company) {
             return InvolvedCompany::where('id', $company)->with(['company'])->first();
         });
+    }
+
+    private function getImageUrl($images)
+    {
+        $basePath = static::IMAGE_BASE_PATH;
+        $id = $images->getAttribute('image_id');
+        if ($id === null) {
+            throw new Error('Property [image_id] is missing from the response. Make sure you specify `image_id` inside the fields attribute.');
+        }
+        $id = '' . $id;
+        return "$basePath/t_original/$id.jpg";
+
     }
 
     private function getReviews($igdb_id)

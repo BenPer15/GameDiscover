@@ -25,6 +25,7 @@ class ReviewRequest extends FormRequest
             'igdb_id' => 'required|integer',
             'platform' => 'string|nullable',
             'content' => 'required|string',
+            'isSpoiler' => 'boolean|nullable',
         ];
     }
 }

@@ -31,26 +31,26 @@ const auth = computed(() => page.props.auth);
                 </Link>
             </div>
             <div v-else class="flex items-center justify-end gap-2">
-                <SecondaryButton class="p-2 text-base">
+                <SecondaryButton class="p-2 text-base w-11 h-11">
                     <i class="bx bx-chat"></i>
                 </SecondaryButton>
 
-                <SecondaryButton class="p-2 text-base">
+                <SecondaryButton class="p-2 text-base w-11 h-11">
                     <i class="bx bx-library"></i>
                 </SecondaryButton>
 
-                <SecondaryButton class="p-2 mr-2 text-base">
+                <SecondaryButton class="p-2 mr-2 text-base w-11 h-11">
                     <i class="bx bx-bell" />
                 </SecondaryButton>
 
                 <Link :href="route('settings.profile.edit')">
                     <img
                         :src="
-                            'https://api.dicebear.com/8.x/bottts-neutral/svg?seed=' +
+                            'https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=' +
                             auth.user.name
                         "
                         alt="avatar"
-                        class="rounded-full w-7 h-7"
+                        class="rounded-md w-11 h-11"
                     />
                 </Link>
             </div>

@@ -30,11 +30,11 @@ const isReviewOwner = computed(
         <div class="flex flex-col items-center gap-2">
             <img
                 :src="
-                    'https://api.dicebear.com/8.x/bottts-neutral/svg?seed=' +
+                    'https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=' +
                     review.user.name
                 "
                 alt="avatar"
-                class="object-cover w-8 h-8 rounded-full"
+                class="object-cover rounded-md w-11 h-11"
             />
             <span class="text-xs font-bold">{{ review.user.name }}</span>
         </div>

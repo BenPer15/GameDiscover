@@ -17,33 +17,15 @@ onMounted(() => {
 
 <template>
     <div>
-        <Transition
-            mode="out-in"
-            name="flash"
-            tag="div"
-            enter-active-class="animate__animated animate__fadeInUp"
-            leave-active-class="animate__animated animate__fadeOutDown"
-            appear
-        >
+        <Transition mode="out-in" name="flash" tag="div" appear>
             <p
-                v-if="type === 'error' && showNotif"
-                class="fixed px-5 py-1 font-semibold text-white bg-red-600 cursor-pointer bottom-3 right-3 rounded-xl"
+                v-if="showNotif"
+                class="fixed z-50 flex items-center gap-2 p-2 px-5 text-sm font-semibold text-white rounded-md cursor-pointer bg-opacity-80 bg-dark-lighter top-20 right-6"
             >
-                {{ message }}
-            </p>
-        </Transition>
-        <Transition
-            mode="out-in"
-            name="flash"
-            tag="div"
-            enter-active-class="animate__animated animate__fadeInUp"
-            leave-active-class="animate__animated animate__fadeOutDown"
-            appear
-        >
-            <p
-                v-if="type === 'success' && showNotif"
-                class="fixed px-5 py-1 font-semibold text-white bg-green-600 cursor-pointer bottom-3 right-3 rounded-xl"
-            >
+                <i
+                    class="text-xl bx"
+                    :class="type === 'success' ? 'bx-check' : 'bxs-error'"
+                ></i>
                 {{ message }}
             </p>
         </Transition>

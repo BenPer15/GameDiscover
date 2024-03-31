@@ -2,6 +2,7 @@
 import { useForm, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
+import Checkbox from "../Checkbox.vue";
 import GameCover from "../GameCover.vue";
 import InputLabel from "../InputLabel.vue";
 import PrimaryButton from "../PrimaryButton.vue";
@@ -23,6 +24,7 @@ const auth = computed(() => page.props.auth);
 const form = useForm({
     platform: props.editedReview?.platform || null,
     content: props.editedReview?.content || "",
+    isSpoiler: props.editedReview?.is_spoiler || false,
     igdb_id: props.gameId,
 });
 
@@ -40,7 +42,7 @@ function submit() {
                 loadingSave.value = false;
             },
             onSuccess: () => {
-                closeModal();
+                props.closeModal();
             },
         });
     } else {
@@ -49,7 +51,7 @@ function submit() {
                 loadingSave.value = false;
             },
             onSuccess: () => {
-                closeModal();
+                props.closeModal();
             },
         });
     }
@@ -76,7 +78,7 @@ function submit() {
 
         <form @submit.prevent="submit" class="">
             <div
-                class="flex flex-col items-start gap-4 p-4 border border-dark-lighter rounded-xl"
+                class="flex flex-col items-start gap-2 p-4 border border-dark-lighter rounded-xl"
             >
                 <div class="w-full">
                     <InputLabel
@@ -119,6 +121,16 @@ function submit() {
                             placeholder="Share your thoughts about this game"
                         />
                     </InputLabel>
+                </div>
+
+                <div class="flex items-center justify-center gap-2 text-xs">
+                    <Checkbox
+                        id="isSpoiler"
+                        :checked="form.isSpoiler"
+                        v-model="form.isSpoiler"
+                        :value="true"
+                    />
+                    <label for="isSpoiler">This review contains spoilers</label>
                 </div>
 
                 <div v-if="Object.keys(form.errors).length">

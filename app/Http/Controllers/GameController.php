@@ -89,12 +89,9 @@ class GameController extends Controller
     public function storeReview(ReviewRequest $request)
     {
         $validated = $request->validated();
-        $review = $validated['content'];
-        $igdb_id = $validated['igdb_id'];
-        $platform = $validated['platform'];
-        $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($review);
+        $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($validated['content']);
         $user = $this->auth->user();
-        $igdbGame = $this->gameService->find((int)$igdb_id);
+        $igdbGame = $this->gameService->find((int)$validated['igdb_id']);
 
         if (!$igdbGame) {
             return redirect()->back()->with([
@@ -105,9 +102,10 @@ class GameController extends Controller
         Review::create(
             [
                 'user_id' => $user->id,
-                'igdb_id' => $igdb_id,
-                'content' => $review ?? null,
-                'platform' => $platform ?? null,
+                'igdb_id' => $validated['igdb_id'],
+                'content' => $validated['content'] ?? null,
+                'platform' => $validated['platform'] ?? null,
+                'isSpoiler' => $validated['isSpoiler'] ?? false,
                 'sentiment_score' => $sentiment_score,
             ]
         );
