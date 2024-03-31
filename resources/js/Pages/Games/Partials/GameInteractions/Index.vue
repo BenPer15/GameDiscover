@@ -30,7 +30,7 @@ onUpdated(() => {
 <template>
     <div class="flex rounded-lg bg-dark-light">
         <Button
-            class="rounded-l-lg"
+            class="gap-1 rounded-l-lg"
             icon="gift"
             :click="() => setStatus('wishlisted')"
             :active="gUI.currentUser?.status === 'wishlisted'"
@@ -39,10 +39,11 @@ onUpdated(() => {
             {{ gUI.totalWishlisted }}
         </Button>
 
-        <div class="py-2 my-auto border-r border-gray-600 h-2/3" />
+        <div class="py-2 my-auto border-r border-dark-lighter h-2/3" />
 
         <Button
             :click="() => setStatus('playing')"
+            class="gap-1"
             icon="joystick"
             :game="gUI"
             :active="gUI.currentUser?.status === 'playing'"
@@ -51,11 +52,11 @@ onUpdated(() => {
             {{ gUI.totalPlaying }}
         </Button>
 
-        <div class="py-2 my-auto border-r border-gray-600 h-2/3" />
+        <div class="py-2 my-auto border-r border-dark-lighter h-2/3" />
 
         <Button
             :click="() => setStatus('played')"
-            class="rounded-r-lg"
+            class="gap-1 rounded-r-lg"
             :game="game"
             icon="check-circle"
             :active="

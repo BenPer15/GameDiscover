@@ -27,7 +27,7 @@ const sortedGenres = computed(() => {
             <div class="flex gap-2">
                 <template v-for="genre in sortedGenres" :key="genre.id">
                     <span
-                        class="px-2 py-1 font-semibold bg-gray-800 rounded-md"
+                        class="px-2 py-1 font-semibold rounded-md bg-dark-lighter"
                     >
                         {{ genre.name }}
                     </span>
@@ -39,7 +39,7 @@ const sortedGenres = computed(() => {
             <div class="flex gap-2">
                 <template v-for="mode in game.game_modes"
                     ><span
-                        class="px-2 py-1 font-semibold bg-gray-800 rounded-md"
+                        class="px-2 py-1 font-semibold rounded-md bg-dark-lighter"
                     >
                         {{ mode.name }}
                     </span>

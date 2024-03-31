@@ -31,16 +31,22 @@ const auth = computed(() => page.props.auth);
                 </Link>
             </div>
             <div v-else class="flex items-center justify-end gap-2">
-                <SecondaryButton class="p-2 text-base w-11 h-11">
-                    <i class="bx bx-chat"></i>
+                <SecondaryButton
+                    class="flex items-center justify-center p-2 w-11 h-11"
+                >
+                    <i class="text-base bx bx-chat"></i>
                 </SecondaryButton>
 
-                <SecondaryButton class="p-2 text-base w-11 h-11">
-                    <i class="bx bx-library"></i>
+                <SecondaryButton
+                    class="flex items-center justify-center p-2 w-11 h-11"
+                >
+                    <i class="text-base bx bx-library"></i>
                 </SecondaryButton>
 
-                <SecondaryButton class="p-2 mr-2 text-base w-11 h-11">
-                    <i class="bx bx-bell" />
+                <SecondaryButton
+                    class="flex items-center justify-center p-2 mr-2 w-11 h-11"
+                >
+                    <i class="text-base bx bx-bell" />
                 </SecondaryButton>
 
                 <Link :href="route('settings.profile.edit')">

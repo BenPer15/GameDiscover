@@ -80,8 +80,9 @@ const searchGames = () => {
                         />
                         <span>
                             {{ game.name }} ({{ game.year_release_date }})
-                            <ul class="flex text-xs text-gray-500">
+                            <ul class="flex flex-wrap text-xs text-gray-500">
                                 <li
+                                    class="flex"
                                     v-for="(platform, index) in game.platforms"
                                     :key="platform.id"
                                 >
