@@ -35,7 +35,8 @@ class ProfileController extends Controller
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
-
+        $age = Carbon::parse($request->birthdate)->age;
+        session(['user_age' => $age]);
         $request->user()->save();
 
         return Redirect::route('settings.profile.edit');

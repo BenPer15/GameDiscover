@@ -2,6 +2,7 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import BasicLayout from "@/Layouts/BasicLayout.vue";
 import { Head, router, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const props = defineProps({
     game: Array,
@@ -9,6 +10,7 @@ const props = defineProps({
     age: Number,
 });
 
+const isNotMature = ref(props.age !== 0 && props.age < 18);
 const form = useForm({
     day: null,
     month: null,
@@ -22,10 +24,6 @@ const submitForm = () => {
     router.post(route("settings.profil.birthdate"), {
         birthdate,
     });
-};
-
-const isNotMature = () => {
-    return age < 18;
 };
 </script>
 
