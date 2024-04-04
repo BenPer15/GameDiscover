@@ -1,16 +1,27 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import BasicLayout from "@/Layouts/BasicLayout.vue";
-import { Head, router, useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { onMounted, ref } from "vue";
+
+import { useGameMatureContent } from "@/Composables/useGameMatureContent";
 
 const props = defineProps({
-    game: Array,
-    matureSynopsis: String,
-    age: Number,
+    gameId: String,
 });
 
-const isNotMature = ref(props.age !== 0 && props.age < 18);
+const page = usePage();
+const age = page.props.auth.user_age;
+
+const { game, matureSynopsis, fetchGameMatureContent } = useGameMatureContent(
+    props.gameId
+);
+
+onMounted(() => {
+    fetchGameMatureContent();
+});
+
+const isNotMature = ref(age !== 0 && age < 18);
 const form = useForm({
     day: null,
     month: null,
@@ -21,9 +32,17 @@ const currentYear = new Date().getFullYear() + 1;
 
 const submitForm = () => {
     const birthdate = `${form.year}-${form.month}-${form.day}`;
-    router.post(route("settings.profil.birthdate"), {
-        birthdate,
-    });
+    router.post(
+        route("settings.profil.birthdate"),
+        {
+            birthdate,
+        },
+        {
+            onSuccess: () => {
+                router.visit(route("games.show", props.gameId));
+            },
+        }
+    );
 };
 </script>
 
@@ -31,16 +50,15 @@ const submitForm = () => {
     <Head :title="game.name" />
 
     <BasicLayout>
-        {{ $age }}
         <div
             class="relative flex max-w-4xl px-3 pb-12 mx-auto border rounded-lg mt-28 border-dark-lighter"
         >
             <div class="flex flex-col max-w-2xl gap-4 mx-auto text-center">
                 <div class="p-0 mb-4 -mt-12">
                     <img
-                        :src="game.background"
+                        :src="game.cover_url"
                         :alt="game.name"
-                        class="w-1/2 mx-auto rounded-md"
+                        class="w-1/3 mx-auto rounded-md"
                     />
                 </div>
 

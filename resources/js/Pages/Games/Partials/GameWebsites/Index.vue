@@ -7,9 +7,8 @@ defineProps({
 </script>
 
 <template>
-    <div class="w-full">
-        <h2 class="text-lg font-semibold">Websites</h2>
-        <div class="flex flex-col gap-2 mt-2">
+    <div class="w-full my-8">
+        <div class="flex flex-wrap gap-2 mt-2">
             <a
                 v-for="website in websites.sort(
                     (a, b) => a.category - b.category
@@ -17,6 +16,7 @@ defineProps({
                 :key="website.id"
                 :href="website.url"
                 target="_blank"
+                class="w-1/5"
             >
                 <Logo :category="website.category" />
             </a>

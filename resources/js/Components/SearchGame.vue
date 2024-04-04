@@ -74,7 +74,7 @@ const searchGames = () => {
                         class="flex items-center gap-4"
                     >
                         <img
-                            :src="game.coverImg"
+                            :src="game.cover_url"
                             :alt="game.name"
                             class="h-16 rounded-md"
                         />

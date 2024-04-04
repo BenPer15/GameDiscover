@@ -1,7 +1,6 @@
 import { computed, ref } from "vue";
 
-export const useGallery = (props) => {
-  const { medias } = props;
+export const useGallery = (medias) => {
   const currentIndex = ref(0);
   const showModal = ref(false);
   const currentImageIndex = ref(null);
@@ -25,7 +24,7 @@ export const useGallery = (props) => {
   };
 
   const nextImageModal = () => {
-    if (currentImageIndex.value < props.medias.length - 1) {
+    if (currentImageIndex.value < medias.length - 1) {
       currentImageIndex.value++;
       currentIndex.value = Math.floor(currentImageIndex.value / 3);
     }

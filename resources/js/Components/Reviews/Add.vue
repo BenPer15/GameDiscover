@@ -9,7 +9,7 @@ import PrimaryButton from "../PrimaryButton.vue";
 import SecondaryButton from "../SecondaryButton.vue";
 
 const props = defineProps({
-    gameId: Number,
+    game: Object,
     closeModal: Function,
     editedReview: {
         type: Object,
@@ -25,11 +25,11 @@ const form = useForm({
     platform: props.editedReview?.platform || null,
     content: props.editedReview?.content || "",
     isSpoiler: props.editedReview?.is_spoiler || false,
-    igdb_id: props.gameId,
+    igdb_id: props.game.id,
 });
 
 const userReview = computed(() => {
-    return page.props.game.reviews.find(
+    return props.game.reviews.find(
         ({ user }) => user.id === auth.value.user.id
     );
 });
@@ -64,16 +64,21 @@ function submit() {
             class="flex items-start gap-4 p-4 border border-dark-lighter rounded-xl"
         >
             <GameCover
-                :url="page.props.game.coverImg"
-                :title="page.props.game.name"
+                :url="game.cover_url"
+                :title="game.name"
                 size="w-24 h-32"
             />
-            <h1 class="text-2xl font-bold">
-                {{ page.props.game.name }}
-                <span class="text-base"
-                    >({{ page.props.game.year_release_date }})</span
-                >
-            </h1>
+            <div class="flex flex-col w-full gap-2">
+                <div class="text-2xl font-bold">
+                    {{ game.name }}
+                    <span class="text-base"
+                        >({{ game.year_release_date }})</span
+                    >
+                </div>
+                <div class="text-xs">
+                    {{ game.summary }}
+                </div>
+            </div>
         </div>
 
         <form @submit.prevent="submit" class="">
@@ -95,7 +100,7 @@ function submit() {
                                 Select a platform
                             </option>
                             <option
-                                v-for="platform in page.props.game.platforms"
+                                v-for="platform in game.platforms"
                                 :value="platform.abbreviation"
                                 :key="platform.id"
                             >

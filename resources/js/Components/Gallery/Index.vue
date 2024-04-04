@@ -20,7 +20,7 @@ const {
     prevImageModal,
     openModal,
     closeModal,
-} = useGallery(props);
+} = useGallery(props.medias);
 </script>
 
 <template>
@@ -32,9 +32,9 @@ const {
             </h2>
             <div class="flex items-center justify-center gap-2">
                 <span
-                    v-for="page in totalPages"
+                    v-for="page in totalPages ?? 0"
                     :key="page"
-                    @click="currentIndex = page - 1"
+                    @click="gallery.currentIndex = page - 1"
                     class="cursor-pointer text-primary"
                     v-bind:class="{
                         'opacity-50 text-white': currentIndex !== page - 1,
@@ -80,7 +80,7 @@ const {
     </div>
 
     <Modal
-        :show="showModal"
+        :show="showModal ?? false"
         :close="closeModal"
         :media="medias[currentImageIndex]"
         :currentImageIndex="currentImageIndex"

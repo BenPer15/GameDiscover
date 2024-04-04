@@ -10,7 +10,6 @@ watch(
         flashes.value.push(next);
     }
 );
-console.log(flashes);
 </script>
 
 <template>

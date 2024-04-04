@@ -2,23 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\Review;
+use App\Models\Game;
 use App\Models\UserGameInteraction;
-use Carbon\Carbon;
 use Error;
 use Exception;
 use Illuminate\Support\Collection ;
 use Illuminate\Support\Facades\Log;
-use MarcReichel\IGDBLaravel\Enums\Image\Size;
 use MarcReichel\IGDBLaravel\Models\Artwork;
-use MarcReichel\IGDBLaravel\Models\Game as IGDBGame;
 use MarcReichel\IGDBLaravel\Models\InvolvedCompany;
 
-use romanzipp\Twitch\Twitch;
+
+use App\Traits\ManagesTwitchStreams;
+use App\Traits\ManagesGameImages;
 
 class GameService
 {
-    protected const IMAGE_BASE_PATH = '//images.igdb.com/igdb/image/upload';
+    use ManagesGameImages;
+    use ManagesTwitchStreams;
+
+    public const HD = 720;
+    public const FULL_HD = 1280;
+
 
     public function search(string $gameName): Collection
     {
@@ -26,7 +30,7 @@ class GameService
             if($gameName === null) {
                 throw new Exception('Game name is required');
             }
-            $igdbGames = IGDBGame::where('name', $gameName)
+            $igdbGames = Game::where('name', $gameName)
                 ->orWhere('name', 'ilike', '%' . $gameName . '%')
                 ->where('platforms', '!=', null)
                 ->select(['id', 'name', 'platforms', 'cover', 'first_release_date'])
@@ -35,8 +39,8 @@ class GameService
                 ->limit(5)
                 ->get();
             return $igdbGames->map(function ($game) {
-                $game->coverImg = $game->cover->getUrl(Size::HD) ?? 'https://via.placeholder.com/264x352?text=No+Cover';
-                $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
+                $game->cover_url = $this->getImageUrl($game->cover);
+                $game->year_release_date = formatDate($game->first_release_date, 'Y');
                 return $game;
             });
 
@@ -49,248 +53,158 @@ class GameService
     public function searchGame($gameName, $orderBy, $asc): Collection
     {
         try {
-            $igdbGames = IGDBGame::where('name', $gameName)
+            return Game::where('name', $gameName)
                ->orWhere('name', 'ilike', '%' . $gameName . '%')
                ->where('platforms', '!=', null)
                ->select([ 'id', 'name', 'platforms', 'cover', 'first_release_date'])
                ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
                ->orderBy($orderBy ?? 'total_rating', $asc ? 'asc' : 'desc')
                ->all();
-            return $igdbGames->map(function ($game) {
-                $game->total_rating = 'N/A';
-                $game->coverImg = $game->cover ? $game->cover->getUrl(Size::HD) : 'https://via.placeholder.com/264x352?text=No+Cover';
-                $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
-                return $game;
-            });
         } catch (Exception $e) {
             return collect([]);
         }
-
     }
 
-    public function find($id): IGDBGame
+    public function find($id): Game
     {
-        $game = IGDBGame::select(['name', 'summary', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'screenshots', 'artworks', 'genres', 'game_modes', 'videos', 'age_ratings' , 'websites'])
+        $game = Game::select(['name', 'summary', 'storyline', 'first_release_date', 'cover', 'platforms', 'involved_companies', 'genres', 'game_modes', 'age_ratings'])
             ->where('id', '=', $id)
-            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'screenshots', 'artworks','game_modes', 'videos', 'age_ratings', 'websites'])
+            ->with(['cover', 'platforms' => ['abbreviation', 'id'], 'genres' => ['name'], 'game_modes', 'age_ratings'])
             ->first();
-
         if (!$game) {
             return collect([]);
         }
-
-        $reviews = $this->getReviews($game->id);
-        $medias = $this->getMedias($game);
         $game->matureContent = $this->getMatureContent($game->age_ratings);
-        $game->reviews = $reviews['reviews'] ?? [];
-        $game->sentimentsScore = $reviews['sentimentScore'];
         $game->gameUserInteractions = $this->getGameUserInteractions($game->id);
-        $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies ?? []);
-        $game->medias = $medias;
-        $game->background = $this->getBackgroundOfGame($medias);
-        $game->stream = $this->getStream($game['id']);
-        $game->coverImg = $game->cover ? $game->cover->getUrl(Size::HD) : 'https://via.placeholder.com/264x352?text=No+Cover';
-        $game->year_release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('Y') : '';
-        $game->release_date = $game->first_release_date ? Carbon::parse($game->first_release_date)->format('d M Y') : '';
+        $game->involved_companies = $this->getCompaniesOfGame($game->involved_companies);
+        $game->cover_url = $this->getImageUrl($game->cover);
+        $game->year_release_date = formatDate($game->first_release_date, 'Y');
+        $game->release_date = formatDate($game->first_release_date);
         return $game;
     }
 
-    private function getMatureContent($ageRatings)
+    private function getMatureContent($ageRatings): ?array
     {
         $listOfMatureRating = [4,5,11,12,16,17,21,22,26,32,33,37,38];
-        $matureRating = null;
-        if ($ageRatings && $ageRatings->isNotEmpty()) {
-            foreach ($ageRatings as $ageRating) {
-                if (in_array($ageRating['rating'], $listOfMatureRating)) {
-                    $matureRating = [
-                        'rating' => $ageRating['rating'],
-                        'synopsis' => $ageRating['synopsis']
-                    ];
-                    break;
-                }
-            }
-        }
-        return $matureRating;
-    }
-
-    private function getStream($gameId)
-    {
-
-        $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-        $acceptLang = ['fr', 'it', 'en', 'es'];
-        $lang = in_array($lang, $acceptLang) ? $lang : 'en';
-
-        $twitch = new Twitch();
-        $twitchGame = $twitch->getGames(['igdb_id' => $gameId])->shift();
-        if (!$twitchGame) {
-            return null;
-        }
-        $streams = $twitch->getStreams(['game_id' => $twitchGame->id, 'first' => 1, 'language' => $lang]);
-        return $streams->shift();
-    }
-
-    private function getRandomImageUrl($images, $condition): ?string
-    {
-        $filteredImages = $images->filter($condition)->values();
-        if ($filteredImages->isNotEmpty()) {
-            return $filteredImages[random_int(0, $filteredImages->count() - 1)]['url'];
-        }
-        return null;
-    }
-
-    private function getBackgroundOfGame($images): string | null
-    {
-        $backgroundFullHD = $this->getRandomImageUrl($images, function ($image) {
-            return $image['fullHd'];
+        $matureRating = $ageRatings->first(function ($ageRating) use ($listOfMatureRating) {
+            return in_array($ageRating['rating'], $listOfMatureRating);
         });
+        return $matureRating ? [
+                'rating' => $matureRating['rating'],
+                'synopsis' => $matureRating['synopsis']
+            ] : null;
 
-        $backgroundHD = $this->getRandomImageUrl($images, function ($image) {
-            return $image['hd'];
+    }
+
+    public function getBackgroundOfGame($id)
+    {
+        $game = Game::select(['screenshots',  'artworks'])
+                   ->where('id', '=', $id)
+                   ->with(['screenshots', 'artworks'])
+                   ->first();
+        $screenshots = $game->screenshots->toArray();
+        $images = collect(array_merge($screenshots, $game->artworks))->map(function ($image) {
+            $id = $image['image_id'];
+            return [
+               'id' => $id,
+                'height' => $image['height'],
+                'hd' => $image['height'] > self::HD && $image['height'] < self::FULL_HD,
+                'fullHd' => $image['height'] >= self::FULL_HD,
+            ];
         });
-
-        $backgroundLow = $this->getRandomImageUrl($images, function ($image) {
-            return !$image['hd'] && !$image['fullHd'];
-        });
-
-
-        return $backgroundFullHD ?? $backgroundHD ?? $backgroundLow ?? null;
+        $fullHdImageUrl = $this->getRandomImageUrl($images, self::FULL_HD);
+        if ($fullHdImageUrl !== null) {
+            return $fullHdImageUrl;
+        }
+        $hdImageUrl = $this->getRandomImageUrl($images, self::HD);
+        if ($hdImageUrl !== null) {
+            return $hdImageUrl;
+        }
+        $otherImageUrl = $this->getRandomImageUrl($images);
+        return $otherImageUrl;
     }
 
 
-    private function getMedias($game): Collection
+    public function getMedias($id): Collection
     {
-        $videos = $game->videos;
-        $images = collect();
-        $screenshots = $game->screenshots;
-        if ($screenshots && $screenshots->isNotEmpty()) {
-            $images = $images->concat($screenshots->map(function ($screenshot) {
+        $game = Game::select(['screenshots', 'videos', 'artworks'])
+                    ->where('id', '=', $id)
+                    ->with(['screenshots', 'videos', 'artworks'])
+                    ->first();
+        $medias = collect($game->videos);
+        $medias = $medias->concat($game->screenshots->map(function ($screenshot) {
+            return [
+                'url' => $this->getImageUrl($screenshot),
+                'type' => 'screenshot',
+                'hd' => $screenshot->height > self::HD && $screenshot->height < self::FULL_HD,
+                'fullHd' => $screenshot->height >= self::FULL_HD,
+            ];
+        }));
+        if (!empty($game->artworks)) {
+            $artworkMedias = collect($game->artworks)->map(function ($artwork) {
+                $artworkObj = Artwork::find($artwork['id']);
                 return [
-                    'url' => $this->getImageUrl($screenshot),
-                    'type' => 'screenshot',
-                    'hd' => $screenshot->height > 720 && $screenshot->height < 1080,
-                    'fullHd' => $screenshot->height >= 1080
-                ];
-            }));
-        }
-        $artworks = $game->artworks;
-
-        if ($artworks && count($artworks) > 0) {
-            $images = $images->concat(array_map(function ($artwork) {
-
-                return [
-                    'url' =>  $this->getImageUrl(Artwork::find($artwork['id'])),
+                    'url' => $this->getImageUrl($artworkObj),
                     'type' => 'artwork',
-                    'hd' => $artwork['height'] > 720,
-                    'fullHd' => $artwork['height'] > 1080
+                    'hd' => $artwork['height'] > self::HD && $artwork['height'] < self::FULL_HD,
+                    'fullHd' => $artwork['height'] >= self::FULL_HD,
                 ];
-            }, $artworks));
+            });
+            $medias = $medias->concat($artworkMedias);
         }
-        return $videos->concat($images);
+        return $medias;
     }
 
     private function getCompaniesOfGame($involvedCompanies): Collection
     {
-        return collect($involvedCompanies)->map(function ($company) {
-            return InvolvedCompany::where('id', $company)->with(['company'])->first();
-        });
+        return InvolvedCompany::whereIn('id', $involvedCompanies)->with(['company'])->get();
     }
 
-    private function getImageUrl($images)
+    private function getImageUrl($image): string
     {
-        $basePath = static::IMAGE_BASE_PATH;
-        $id = $images->getAttribute('image_id');
+        if($image === null) {
+            return 'https://via.placeholder.com/264x352?text=No+Cover';
+        }
+        $id = $image->getAttribute('image_id');
         if ($id === null) {
             throw new Error('Property [image_id] is missing from the response. Make sure you specify `image_id` inside the fields attribute.');
         }
-        $id = '' . $id;
-        return "$basePath/t_original/$id.jpg";
 
+        return static::IMAGE_BASE_PATH . "/t_original/$id.jpg";
     }
 
-    private function getReviews($igdb_id)
+
+    private function getGameUserInteractions($igdb_id): array
     {
-        $reviewsData = Review::where('igdb_id', $igdb_id)->with(['likes', 'comments'])->get();
-        if($reviewsData->isEmpty()) {
-            return [
-                'reviews' => [],
-                'sentimentScore' => [
-                    'count' => 0,
-                    'total' => 0
-                ],
-            ];
-        }
-
-        // Filter reviews with content
-        $reviews = $reviewsData->filter(function ($data) {
-            return $data->content !== null;
-        })->map(function ($review) {
-            return [
-                'id' => $review->id,
-                'content' => $review->content,
-                'sentiment_score' => $review->sentiment_score,
-                'user' => $review->user,
-                'likes' => $review->likes,
-                'comments' => $review->comments,
-                'created_at' =>  Carbon::parse($review->created_at)->format('d M Y')
-            ];
-        });
-
-        // Calculate sentiment score
-        $sentimentScores = $reviewsData->pluck('sentiment_score');
-        if ($sentimentScores->isNotEmpty()) {
-            $countSentimentScore = $sentimentScores->count();
-            $totalSentimentScore = $sentimentScores->sum() / $sentimentScores->count();
-        }
-
-        return [
-            'reviews' => $reviews,
-            'sentimentScore' => [
-                'count' => $countSentimentScore ?? 0,
-                'total' => $totalSentimentScore ?? 0
-            ],
-        ];
-    }
-
-    private function getGameUserInteractions($igdb_id)
-    {
-        $totalPlaying = 0;
-        $totalWishlisted = 0;
-        $totalPlayed = 0;
-        $totalFavorite = 0;
-
         $userGameInteractionsData = UserGameInteraction::where('igdb_id', $igdb_id)->get();
-
-        $status = $userGameInteractionsData->pluck('status');
-        if ($status->isNotEmpty()) {
-            $totalPlaying = $status->filter(function ($value) {
-                return $value === 'playing';
-            })->count();
-            $totalWishlisted = $status->filter(function ($value) {
-                return $value === 'wishlisted';
-            })->count();
-            $totalPlayed = $status->filter(function ($value) {
-                return $value === 'played' || $value === 'completed' || $value === 'dropped';
-            })->count();
-        }
-
-        $isFavorite = $userGameInteractionsData->pluck('is_favorite');
-        if ($isFavorite->isNotEmpty()) {
-            $totalFavorite = $isFavorite->filter(function ($value) {
-                return $value === true;
-            })->count();
-        }
-
-        $gameInteractionByUser = $userGameInteractionsData->filter(function ($data) {
-            return $data->user_id === auth()->id();
-        })->first();
-
-
+        $statusCounts = $userGameInteractionsData->groupBy('status')
+                ->map->count();
+        $totalPlaying = $statusCounts->get('playing', 0);
+        $totalWishlisted = $statusCounts->get('wishlisted', 0);
+        $totalPlayed = collect(['played', 'completed', 'dropped'])
+                ->sum(function ($status) use ($statusCounts) {
+                    return $statusCounts->get($status, 0);
+                });
+        $gameInteractionByUser = $userGameInteractionsData->firstWhere('user_id', auth()->id());
         return [
             'totalPlaying' => $totalPlaying,
             'totalWishlisted' => $totalWishlisted,
             'totalPlayed' => $totalPlayed,
-            'totalFavorite' => $totalFavorite,
             'currentUser' => $gameInteractionByUser
         ];
+    }
+
+    public function getMatureContentForGame($id)
+    {
+        $game = Game::select(['name', 'cover', 'age_ratings'])
+            ->where('id', '=', (int)$id)
+            ->with(['cover', 'age_ratings'])
+            ->first();
+        if (!$game) {
+            return collect([]);
+        }
+        $game->matureContent = $this->getMatureContent($game->age_ratings);
+        $game->cover_url = $this->getImageUrl($game->cover);
+        return $game;
     }
 }

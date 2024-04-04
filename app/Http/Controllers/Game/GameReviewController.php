@@ -1,97 +1,30 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Game;
 
 use App\Http\Requests\LikeReviewRequest;
 use App\Http\Requests\ReviewRequest;
-
-use App\Http\Requests\UserGameInteractionRequest;
 use App\Models\Review;
 use App\Models\ReviewLike;
-use App\Models\User;
-use App\Models\UserGameInteraction;
-use App\Services\GameService;
 use App\Services\GoogleCloudService;
-use Carbon\Carbon;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
-class GameController extends Controller
+class GameReviewController extends GameBaseController
 {
-    protected $gameService;
-    protected $auth;
     protected $googleCloudService;
 
-
-    public function __construct(GameService $gameService, Guard $auth, GoogleCloudService $googleCloudService)
+    public function __construct(GoogleCloudService $googleCloudService)
     {
-        $this->gameService = $gameService;
-        $this->auth = $auth;
         $this->googleCloudService = $googleCloudService;
     }
 
-    public function search(Request $request)
+    public function getReviews($id)
     {
-        $query = $request->input('q');
-        $games = $this->gameService->search($query);
-        return response()->json($games);
-    }
-
-    public function searchAll(Request $request)
-    {
-        $query = $request->input('q');
-        $sort = $request->input('sort');
-        $asc = $request->input('asc');
-
-        $games = $this->gameService->searchGame($query, $sort, $asc);
-        return Inertia::render('Games/Index', compact('games', 'query', 'sort', 'asc'));
-    }
-
-    public function advancedSearch(Request $request)
-    {
-        // $searchTerm = $request->input('q');
-        // $games = $this->gameService->searchGame($searchTerm);
-        // return response()->json($games);
-    }
-
-    public function show(Request $request, $id)
-    {
-        $age = session('user_age', 0);
-        $game = $this->gameService->find((int)$id);
-        if($game->matureContent && ($age < 18 || $age === 0)) {
-            return Inertia::render('MatureForm', ['game' => $game, 'age' => $age, 'matureSynopsis' => $game->matureContent['synopsis']]);
+        $reviewsData = Review::where('igdb_id', $id)->with(['likes', 'comments', 'user'])->get();
+        if($reviewsData->isEmpty()) {
+            return [];
         }
-        return Inertia::render('Games/Show', ['game' => $game]);
+        return $reviewsData->whereNotNull('content');
     }
-
-    public function storeUserGameInteraction(UserGameInteractionRequest $request)
-    {
-        $validated = $request->validated();
-        $user = $this->auth->user();
-        UserGameInteraction::create(
-            [
-                'user_id' => $user->id,
-                'igdb_id' => $validated['igdb_id'],
-                'status' => $validated['status'] ?? null,
-                'is_favorite' => $validated['is_favorite'] ?? false,
-            ]
-        );
-    }
-
-    public function updateUserGameInteraction(UserGameInteractionRequest $request, $id)
-    {
-        $userGameInteraction = UserGameInteraction::findOrFail($id);
-        $validated = $request->validated();
-        $userGameInteraction->update(
-            [
-                'status' => $validated['status'],
-                'is_favorite' => $validated['is_favorite'] ?? $userGameInteraction->is_favorite,
-            ]
-        );
-    }
-
 
     public function storeReview(ReviewRequest $request)
     {
@@ -162,16 +95,11 @@ class GameController extends Controller
 
     public function destroyLikeReview($id)
     {
-
         $reviewLike = ReviewLike::findOrFail($id);
         $reviewLike->delete();
         return redirect()->back()->with([
             'type' => 'success',
             'message' => 'Like deleted successfully',
         ]);
-
-
     }
-
-
 }

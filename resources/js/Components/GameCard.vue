@@ -15,7 +15,7 @@ const props = defineProps({
         class="relative overflow-hidden rounded-md shadow h-72 gameCard"
     >
         <div class="absolute w-full h-full rounded-md gameCard__border" />
-        <img :src="game.coverImg" :alt="game.title" class="absolute z-[-2]" />
+        <img :src="game.cover_url" :alt="game.title" class="absolute z-[-2]" />
         <div
             class="absolute bottom-0 w-full h-20 z-[-1] gameCard__content flex justify-between flex-col p-2"
         >

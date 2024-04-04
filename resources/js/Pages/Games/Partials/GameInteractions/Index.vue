@@ -1,6 +1,5 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
-import { defineProps, onUpdated, ref } from "vue";
+import { defineProps, ref, watch } from "vue";
 import Button from "./Button.vue";
 
 const props = defineProps({
@@ -8,35 +7,55 @@ const props = defineProps({
     igdbId: Number,
 });
 
-const gUI = ref(props.gameUserInteractions);
+const userInteractions = ref(props.gameUserInteractions);
+
+watch(
+    () => props.gameUserInteractions,
+    (newVal) => {
+        userInteractions.value = newVal;
+    }
+);
 
 const setStatus = (status) => {
     const data = {
-        status: status === gUI.value.currentUser?.status ? null : status,
+        status:
+            status === userInteractions.value.currentUser?.status
+                ? null
+                : status,
         igdb_id: props.igdbId,
     };
-    if (gUI.value.currentUser) {
-        router.put(route("games.updateStatus", gUI.value.currentUser.id), data);
+
+    if (userInteractions.value.currentUser) {
+        axios
+            .put(
+                route(
+                    "games.updateStatus",
+                    userInteractions.value.currentUser.id
+                ),
+                data
+            )
+            .then((response) => {
+                userInteractions.value = response.data;
+            });
     } else {
-        router.post(route("games.storeStatus"), data);
+        axios.post(route("games.storeStatus"), data).then((response) => {
+            userInteractions.value = response.data;
+        });
     }
 };
-
-onUpdated(() => {
-    gUI.value = usePage().props.game.gameUserInteractions;
-});
 </script>
 
 <template>
+    {{ gUI }}
     <div class="flex rounded-lg bg-dark-light">
         <Button
             class="gap-1 rounded-l-lg"
             icon="gift"
             :click="() => setStatus('wishlisted')"
-            :active="gUI.currentUser?.status === 'wishlisted'"
+            :active="userInteractions?.currentUser?.status === 'wishlisted'"
         >
             <span>Wishlist</span>
-            {{ gUI.totalWishlisted }}
+            {{ userInteractions.totalWishlisted }}
         </Button>
 
         <div class="py-2 my-auto border-r border-dark-lighter h-2/3" />
@@ -45,11 +64,11 @@ onUpdated(() => {
             :click="() => setStatus('playing')"
             class="gap-1"
             icon="joystick"
-            :game="gUI"
-            :active="gUI.currentUser?.status === 'playing'"
+            :game="userInteractions"
+            :active="userInteractions.currentUser?.status === 'playing'"
         >
             <span>Playing</span>
-            {{ gUI.totalPlaying }}
+            {{ userInteractions.totalPlaying }}
         </Button>
 
         <div class="py-2 my-auto border-r border-dark-lighter h-2/3" />
@@ -61,18 +80,18 @@ onUpdated(() => {
             icon="check-circle"
             :active="
                 ['played', 'completed', 'aborded'].includes(
-                    gUI.currentUser?.status
+                    userInteractions.currentUser?.status
                 )
             "
         >
             <span class="first-letter:uppercase">{{
                 ["played", "completed", "aborded"].includes(
-                    gUI.currentUser?.status
+                    userInteractions.currentUser?.status
                 )
-                    ? gUI.currentUser?.status
+                    ? userInteractions.currentUser?.status
                     : "Played"
             }}</span>
-            {{ gUI.totalPlayed }}
+            {{ userInteractions.totalPlayed }}
         </Button>
     </div>
 </template>

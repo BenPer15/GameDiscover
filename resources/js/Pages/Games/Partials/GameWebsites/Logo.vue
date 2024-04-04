@@ -75,7 +75,7 @@ const logo = logoEnum[props.category];
 </script>
 
 <template>
-    <div class="flex items-center justify-start gap-4 text-xs text-white group">
+    <div class="flex items-center justify-start gap-2 text-xs text-white group">
         <div
             class="flex items-center justify-center w-6 h-6 p-1 no-underline rounded-md opacity-80 group-hover:opacity-100"
             :class="logo.bgColor ?? 'bg-dark-lighter'"
