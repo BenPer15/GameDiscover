@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from "@inertiajs/vue3";
+import { Head, usePage } from "@inertiajs/vue3";
 import { defineAsyncComponent, onMounted } from "vue";
 
 import GameCover from "@/Components/GameCover.vue";
@@ -22,6 +22,9 @@ import GameInfo from "./Partials/Info/Index.vue";
 const props = defineProps({
     game_id: String,
 });
+
+const page = usePage();
+const authUser = page.props.auth.user;
 
 const { game, background, isLoading, error, fetchGameData } = useGameData(
     props.game_id

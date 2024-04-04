@@ -72,15 +72,12 @@ class ProfileController extends Controller
         $request->validate([
             'birthdate' => 'required|date',
         ]);
-
         $user = Auth::user();
-
         if ($user && $user instanceof User) {
             $user->birthdate = $request->birthdate;
             $user->save();
         }
         $age = Carbon::parse($request->birthdate)->age;
         session(['user_age' => $age]);
-        return redirect()->back();
     }
 }

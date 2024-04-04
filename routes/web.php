@@ -24,7 +24,6 @@ Route::prefix('api')->group(function () {
     Route::get('/games/{id}/user-interactions', [GameUserInteractionController::class, 'getUserInteractions'])->name('api.games.userInteractions');
 });
 
-
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::get('/games/{id}/reviews', [GameReviewController::class, 'getReviews'])->name('api.games.reviews');
     Route::post('/review', [GameReviewController::class, 'storeReview'])->name('games.storeReview');
@@ -36,14 +35,13 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::put('/status/{id}', [GameUserInteractionController::class, 'updateUserGameInteraction'])->name('games.updateStatus');
 });
 
-
+Route::post('/settings/birthdate', [ProfileController::class, 'storeBirthdate'])->name('settings.profil.birthdate');
 Route::middleware('auth')->prefix('settings')->name('settings.')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/security', [SettingsController::class, 'security'])->name('security.edit');
     Route::get('/advanced', [SettingsController::class, 'advanced'])->name('advanced');
-    Route::post('/birthdate', [ProfileController::class, 'storeBirthdate'])->name('profil.birthdate');
 });
 
 require __DIR__.'/auth.php';

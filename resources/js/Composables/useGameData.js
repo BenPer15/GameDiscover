@@ -8,7 +8,9 @@ export function useGameData(gameId) {
   const error = ref(null);
 
   const page = usePage();
-  const age = page.props.auth.user_age;
+  const age = page.props.user_age;
+
+  console.log(page.props);
 
   const fetchGameData = async () => {
     isLoading.value = true;

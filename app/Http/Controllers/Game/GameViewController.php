@@ -9,6 +9,7 @@ class GameViewController extends GameBaseController
 {
     public function show($id)
     {
+        $age = session('user_age', 0);
         return Inertia::render('Games/Show', ['game_id' => $id]);
     }
 

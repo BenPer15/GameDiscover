@@ -11,7 +11,6 @@ export function useGameMatureContent(gameId) {
     error.value = null;
     try {
       const response = await axios.get(route("api.games.matureContent", { gameId }));
-      console.log(response.data);
       game.value = response.data;
       matureSynopsis.value = response.data.matureContent.synopsis;
     } catch (e) {

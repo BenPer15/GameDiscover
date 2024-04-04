@@ -11,7 +11,7 @@ const props = defineProps({
 });
 
 const page = usePage();
-const age = page.props.auth.user_age;
+const age = page.props.user_age;
 
 const { game, matureSynopsis, fetchGameMatureContent } = useGameMatureContent(
     props.gameId

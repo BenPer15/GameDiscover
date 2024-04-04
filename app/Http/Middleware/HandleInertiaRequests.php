@@ -37,8 +37,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'auth' => [
                 'user' => $request->user(),
-                'user_age' => $request->session()->get('user_age') ?? 0,
             ],
+            'user_age' => session('user_age', 0),
         ];
     }
 }

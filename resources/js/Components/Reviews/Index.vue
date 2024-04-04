@@ -20,7 +20,9 @@ const { reviews, isLoading, fetchGameReviews } = useGameReviews(
 );
 
 onMounted(() => {
-    fetchGameReviews();
+    if (auth.value.user) {
+        fetchGameReviews();
+    }
 });
 
 const currentUserHasReview = computed(() => {
