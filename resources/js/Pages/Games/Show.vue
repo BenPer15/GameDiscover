@@ -16,6 +16,7 @@ const Reviews = defineAsyncComponent(() =>
     import("@/Components/Reviews/Index.vue")
 );
 
+import TwitchLive from "@/Components/TwitchLive.vue";
 import GameInteractions from "./Partials/GameInteractions/Index.vue";
 import GameInfo from "./Partials/Info/Index.vue";
 
@@ -116,17 +117,16 @@ const getDeveloper = (involved_companies) =>
                                     v-if="game.summary"
                                     :text="game.summary"
                                 />
-                                <!-- <GameWebsites  :gameId="game.id"/> -->
+                                <GameWebsites :gameId="game.id" />
                                 <Reviews :game="game" />
                             </div>
 
                             <div class="flex flex-col w-1/3 px-4">
-                                <!-- <TwitchLive
-                                v-if="game.stream"
-                                :stream="game.stream"
-                                height="150"
-                                width="520"
-                            /> -->
+                                <TwitchLive
+                                    :gameId="game.id"
+                                    height="150"
+                                    width="520"
+                                />
                                 <Gallery :medias="medias" maxLength="500" />
                             </div>
                         </div>

@@ -3,7 +3,6 @@ import { ref } from "vue";
 
 const props = defineProps({
     media: Object,
-    class: String,
 });
 const origin = window.location.origin;
 const isHover = ref(false);

@@ -10,7 +10,6 @@ trait ManagesTwitchStreams
     {
 
         $lang = in_array($lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $acceptLang = ['fr', 'it', 'en', 'es']) ? $lang : 'en';
-
         $twitch = new Twitch();
 
         if ($twitchGame = $twitch->getGames(['igdb_id' => $gameId])->shift()) {

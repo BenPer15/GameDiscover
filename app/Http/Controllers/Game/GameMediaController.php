@@ -8,8 +8,7 @@ class GameMediaController extends GameBaseController
 {
     public function getTwitchStream($id)
     {
-        // $game = $this->gameService->find((int)$id);
-        // $twitchStreams = $this->gameService->getTwitchStreams($game->name);
-        // return response()->json($twitchStreams);
+        $twitchStreams = $this->gameService->getStream($id);
+        return response()->json($twitchStreams);
     }
 }

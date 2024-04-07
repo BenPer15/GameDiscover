@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Game\GameApiController;
+use App\Http\Controllers\Game\GameMediaController;
 use App\Http\Controllers\Game\GameReviewController;
 use App\Http\Controllers\Game\GameUserInteractionController;
 use App\Http\Controllers\Game\GameViewController;
@@ -22,6 +23,7 @@ Route::prefix('api')->group(function () {
     Route::get('/games/{id}/background', [GameApiController::class, 'getBackgroundImage'])->name('api.games.background');
     Route::get('/games/{id}/medias', [GameApiController::class, 'getMedias'])->name('api.games.medias');
     Route::get('/games/{id}/user-interactions', [GameUserInteractionController::class, 'getUserInteractions'])->name('api.games.userInteractions');
+    Route::get('/games/{id}/streams', [GameMediaController::class, 'getTwitchStream'])->name('api.games.streams');
 });
 
 Route::middleware('auth')->prefix('api')->group(function () {

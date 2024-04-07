@@ -7,6 +7,7 @@ const props = defineProps({
         required: true,
     },
 });
+console.log(props.game);
 </script>
 
 <template>

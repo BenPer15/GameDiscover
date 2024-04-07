@@ -14,6 +14,7 @@ use MarcReichel\IGDBLaravel\Models\InvolvedCompany;
 
 use App\Traits\ManagesTwitchStreams;
 use App\Traits\ManagesGameImages;
+use romanzipp\Twitch\Twitch;
 
 class GameService
 {
@@ -53,13 +54,18 @@ class GameService
     public function searchGame($gameName, $orderBy, $asc): Collection
     {
         try {
-            return Game::where('name', $gameName)
+            $game = Game::where('name', $gameName)
                ->orWhere('name', 'ilike', '%' . $gameName . '%')
                ->where('platforms', '!=', null)
                ->select([ 'id', 'name', 'platforms', 'cover', 'first_release_date'])
                ->with(['cover', 'platforms' => ['abbreviation' , 'id']])
                ->orderBy($orderBy ?? 'total_rating', $asc ? 'asc' : 'desc')
                ->all();
+            return $game->map(function ($game) {
+                $game->cover_url = $this->getImageUrl($game->cover);
+                $game->release_date = formatDate($game->first_release_date);
+                return $game;
+            });
         } catch (Exception $e) {
             return collect([]);
         }
@@ -85,6 +91,9 @@ class GameService
 
     private function getMatureContent($ageRatings): ?array
     {
+        if ($ageRatings === null) {
+            return null;
+        }
         $listOfMatureRating = [4,5,11,12,16,17,21,22,26,32,33,37,38];
         $matureRating = $ageRatings->first(function ($ageRating) use ($listOfMatureRating) {
             return in_array($ageRating['rating'], $listOfMatureRating);
@@ -103,7 +112,8 @@ class GameService
                    ->with(['screenshots', 'artworks'])
                    ->first();
         $screenshots = $game->screenshots->toArray();
-        $images = collect(array_merge($screenshots, $game->artworks))->map(function ($image) {
+
+        $images = collect($game->artworks ? array_merge($screenshots, $game->artworks) : $screenshots)->map(function ($image) {
             $id = $image['image_id'];
             return [
                'id' => $id,
@@ -157,6 +167,9 @@ class GameService
 
     private function getCompaniesOfGame($involvedCompanies): Collection
     {
+        if($involvedCompanies === null) {
+            return collect([]);
+        }
         return InvolvedCompany::whereIn('id', $involvedCompanies)->with(['company'])->get();
     }
 
@@ -206,5 +219,16 @@ class GameService
         $game->matureContent = $this->getMatureContent($game->age_ratings);
         $game->cover_url = $this->getImageUrl($game->cover);
         return $game;
+    }
+
+    public function getStream($gameId)
+    {
+        $lang = in_array($lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), $acceptLang = ['fr', 'it', 'en', 'es']) ? $lang : 'en';
+        $twitch = new Twitch();
+
+        if ($twitchGame = $twitch->getGames(['igdb_id' => $gameId])->shift()) {
+            return $twitch->getStreams(['game_id' => $twitchGame->id, 'first' => 1, 'language' => $lang])->shift();
+        }
+        return null;
     }
 }

@@ -1,9 +1,12 @@
 <script setup>
-import { ref } from "vue";
+import { useGameStream } from "@/Composables/useGameStream";
+import { onMounted, ref } from "vue";
 import SecondaryButton from "./SecondaryButton.vue";
+
 const showing = ref(false);
-defineProps({
-    stream: Object,
+
+const props = defineProps({
+    gameId: String,
     height: {
         type: Number,
         default: 320,
@@ -13,7 +16,15 @@ defineProps({
         default: 550,
     },
 });
+
 const parent = window.location.hostname;
+const { stream, isLoading, error, fetchGameStream } = useGameStream(
+    props.gameId
+);
+
+onMounted(() => {
+    fetchGameStream();
+});
 
 const showLive = () => {
     showing.value = !showing.value;
@@ -21,7 +32,10 @@ const showLive = () => {
 </script>
 
 <template>
-    <div class="flex flex-col w-full gap-3 mb-4">
+    <div
+        v-show="Object.keys(stream).length !== 0"
+        class="flex flex-col w-full gap-3 mb-4"
+    >
         <h2 class="text-2xl font-bold">Live Twitch</h2>
         <div v-if="!showing" class="flex flex-col w-full gap-3">
             <div class="text-2xs">
