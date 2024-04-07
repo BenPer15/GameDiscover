@@ -22,37 +22,31 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 
 const form = useForm({
-    platform: props.editedReview?.platform || null,
+    platform:
+        props.editedReview?.platform || props.game.platforms.length === 1
+            ? props.game.platforms[0].abbreviation
+            : null,
     content: props.editedReview?.content || "",
     isSpoiler: props.editedReview?.is_spoiler || false,
     igdb_id: props.game.id,
 });
 
-const userReview = computed(() => {
-    return props.game.reviews.find(
-        ({ user }) => user.id === auth.value.user.id
-    );
-});
-
 function submit() {
     loadingSave.value = true;
     if (props.editedReview) {
-        form.put(route("games.updateReview", props.editedReview.id), {
-            onFinish: () => {
+        axios
+            .put(
+                route("games.updateReview", props.editedReview.id),
+                form.data()
+            )
+            .then((response) => {
+                props.closeModal(response.data.review);
                 loadingSave.value = false;
-            },
-            onSuccess: () => {
-                props.closeModal();
-            },
-        });
+            });
     } else {
-        form.post(route("games.storeReview"), {
-            onFinish: () => {
-                loadingSave.value = false;
-            },
-            onSuccess: () => {
-                props.closeModal();
-            },
+        axios.post(route("games.storeReview"), form.data()).then((response) => {
+            props.closeModal(response.data.review);
+            loadingSave.value = false;
         });
     }
 }

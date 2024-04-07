@@ -6,14 +6,17 @@ use App\Http\Requests\LikeReviewRequest;
 use App\Http\Requests\ReviewRequest;
 use App\Models\Review;
 use App\Models\ReviewLike;
+use App\Services\GameService;
 use App\Services\GoogleCloudService;
+use Illuminate\Contracts\Auth\Guard;
 
 class GameReviewController extends GameBaseController
 {
     protected $googleCloudService;
 
-    public function __construct(GoogleCloudService $googleCloudService)
+    public function __construct(GameService $gameService, Guard $auth, GoogleCloudService $googleCloudService)
     {
+        parent::__construct($gameService, $auth);
         $this->googleCloudService = $googleCloudService;
     }
 
@@ -31,15 +34,7 @@ class GameReviewController extends GameBaseController
         $validated = $request->validated();
         $sentiment_score = $this->googleCloudService->reviewAnalyseSentiment($validated['content']);
         $user = $this->auth->user();
-        $igdbGame = $this->gameService->find((int)$validated['igdb_id']);
-
-        if (!$igdbGame) {
-            return redirect()->back()->with([
-                'type' => 'error',
-                'message' => 'Game not found',
-            ]);
-        }
-        Review::create(
+        $review = Review::create(
             [
                 'user_id' => $user->id,
                 'igdb_id' => $validated['igdb_id'],
@@ -49,10 +44,13 @@ class GameReviewController extends GameBaseController
                 'sentiment_score' => $sentiment_score,
             ]
         );
-        return redirect()->back()->with([
-            'type' => 'success',
-            'message' => 'Your review has been added successfully',
-        ]);
+        $review->load(['likes', 'comments', 'user']);
+        return response()->json([
+                'type' => 'success',
+                'message' => 'Your review has been added successfully',
+                'review' => $review,
+            ]);
+
     }
 
     public function updateReview(ReviewRequest $request, $id)
@@ -66,14 +64,18 @@ class GameReviewController extends GameBaseController
         $review->sentiment_score = $hasReview ? $sentiment_score : $review->sentiment_score;
         $review->content = $validated['content'] ?? $review->content;
         $review->save();
-        return redirect()->route('games.show', ['id' => $review->igdb_id]);
+        return response()->json([
+               'type' => 'success',
+               'message' => 'Your review has been updated successfully',
+               'review' => $review,
+           ]);
     }
 
     public function destroyReview($id)
     {
         $review = Review::findOrFail($id);
         $review->delete();
-        return redirect()->back()->with([
+        return response()->json([
             'type' => 'success',
             'message' => 'Review deleted successfully',
         ]);
@@ -86,10 +88,10 @@ class GameReviewController extends GameBaseController
         $review = Review::find($validated['review_id']);
         $review->likes()->create(['user_id' => $user->id]);
 
-        return redirect()->back()->with([
-            'type' => 'success',
-            'message' => 'Like added successfully',
-        ]);
+        return response()->json([
+             'type' => 'success',
+             'message' => 'Like added successfully',
+         ]);
 
     }
 
@@ -97,9 +99,9 @@ class GameReviewController extends GameBaseController
     {
         $reviewLike = ReviewLike::findOrFail($id);
         $reviewLike->delete();
-        return redirect()->back()->with([
-            'type' => 'success',
-            'message' => 'Like deleted successfully',
-        ]);
+        return response()->json([
+             'type' => 'success',
+             'message' => 'Like deleted successfully',
+         ]);
     }
 }

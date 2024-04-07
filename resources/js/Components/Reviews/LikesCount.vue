@@ -1,33 +1,42 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { onMounted, ref } from "vue";
 
+const countLikes = ref(0);
+const userLikedReview = ref(false);
+const auth = ref(null);
 const props = defineProps({
     likes: Object,
     review_id: Number,
 });
 
 const page = usePage();
-const auth = computed(() => page.props.auth);
-const countLikes = computed(() => props.likes.length);
 
-const userLikedReview = computed(() =>
-    props.likes.find((like) => like.user_id === auth.value.user.id)
-);
+onMounted(() => {
+    auth.value = page.props.auth;
+    countLikes.value = props.likes.length;
+    userLikedReview.value = props.likes.find(
+        (like) => like.user_id === auth.value.user.id
+    );
+});
 
 const likeReview = () => {
     if (!!userLikedReview.value) {
-        router.post(
-            route("games.review.destroyLike", userLikedReview.value.id)
-        );
-        userLikedReview.value = false;
-        countLikes.value -= 1;
+        axios
+            .post(route("games.review.destroyLike", userLikedReview.value.id))
+            .then(() => {
+                userLikedReview.value = false;
+                countLikes.value -= 1;
+            });
     } else {
-        router.post(route("games.review.storeLike"), {
-            review_id: props.review_id,
-        });
-        userLikedReview.value = true;
-        countLikes.value += 1;
+        axios
+            .post(route("games.review.storeLike"), {
+                review_id: props.review_id,
+            })
+            .then(() => {
+                userLikedReview.value = true;
+                countLikes.value += 1;
+            });
     }
 };
 </script>

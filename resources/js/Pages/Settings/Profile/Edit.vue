@@ -21,7 +21,6 @@ defineProps({
             <UpdateProfileInformationForm
                 :must-verify-email="mustVerifyEmail"
                 :status="status"
-                class="max-w-xl"
             />
         </div>
     </SettingsLayout>

@@ -11,15 +11,12 @@ use Illuminate\Support\Facades\Log;
 use MarcReichel\IGDBLaravel\Models\Artwork;
 use MarcReichel\IGDBLaravel\Models\InvolvedCompany;
 
-
-use App\Traits\ManagesTwitchStreams;
 use App\Traits\ManagesGameImages;
 use romanzipp\Twitch\Twitch;
 
 class GameService
 {
     use ManagesGameImages;
-    use ManagesTwitchStreams;
 
     public const HD = 720;
     public const FULL_HD = 1280;

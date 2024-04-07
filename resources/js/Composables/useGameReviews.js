@@ -18,5 +18,10 @@ export function useGameReviews(gameId) {
     }
   };
 
-  return { reviews, isLoading, error, fetchGameReviews };
+  const addReview = (review) => {
+    console.log(review);
+    reviews.value.unshift(review);
+  };
+
+  return { reviews, isLoading, error, fetchGameReviews, addReview };
 }

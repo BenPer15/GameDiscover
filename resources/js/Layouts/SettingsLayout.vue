@@ -8,7 +8,7 @@ import BasicLayout from "./BasicLayout.vue";
             class="grid grid-flow-row-dense grid-cols-4 gap-4 py-12 mx-auto max-w-7xl"
         >
             <SettingsNav />
-            <div class="w-full col-span-3 p-4 rounded-lg shadow">
+            <div class="w-full col-span-3">
                 <slot />
             </div>
         </div>

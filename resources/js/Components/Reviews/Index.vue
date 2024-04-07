@@ -15,7 +15,7 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 const showAddReviewModal = ref(false);
 
-const { reviews, isLoading, fetchGameReviews } = useGameReviews(
+const { reviews, isLoading, fetchGameReviews, addReview } = useGameReviews(
     page.props.game_id
 );
 
@@ -35,8 +35,9 @@ const openAddReviewModal = () => {
     showAddReviewModal.value = true;
 };
 
-const closeModal = () => {
+const closeModal = (review) => {
     showAddReviewModal.value = null;
+    addReview(review);
 };
 </script>
 

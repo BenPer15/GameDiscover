@@ -1,6 +1,6 @@
 <script setup>
-import { router, usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { onMounted, ref } from "vue";
 import CommentsCount from "./CommentsCount.vue";
 import LikesCount from "./LikesCount.vue";
 import Score from "./Score.vue";
@@ -9,20 +9,24 @@ const props = defineProps({
     review: Object,
 });
 
+const auth = ref(null);
+const isReviewOwner = ref(false);
+
 const page = usePage();
-const auth = computed(() => page.props.auth);
 
 const removeReview = () => {
     if (!isReviewOwner.value) return;
 
     if (confirm("Are you sure you want to delete this review?")) {
-        router.delete(route("games.destroyReview", props.review.id));
+        axios.delete(route("games.destroyReview", props.review.id));
     }
 };
 
-const isReviewOwner = computed(
-    () => props.review.user.id === auth.value.user.id
-);
+onMounted(() => {
+    auth.value = page.props.auth;
+    console.log(auth.value);
+    isReviewOwner.value = props.review.user.id === auth.value.user.id;
+});
 </script>
 
 <template>
@@ -43,7 +47,7 @@ const isReviewOwner = computed(
                 <div class="flex items-center gap-2">
                     <Score :score="review.sentiment_score" />
                     <span class="text-xs text-gray-500">{{
-                        review.created_at
+                        new Date(review.created_at).toLocaleDateString()
                     }}</span>
                 </div>
 

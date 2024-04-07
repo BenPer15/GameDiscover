@@ -48,7 +48,7 @@ const getDeveloper = (involved_companies) =>
     <BasicLayout>
         <div
             v-if="isLoading || !game"
-            class="flex items-center justify-center h-screen"
+            class="absolute top-0 left-0 flex items-center justify-center w-full h-full"
         >
             <i class="text-4xl bx bx-loader-alt animate-spin" />
         </div>
